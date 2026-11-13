@@ -1,0 +1,19 @@
+{
+ "schema": 1,
+ "argv": [
+  "cargo",
+  "build"
+ ],
+ "io": "attached",
+ "pty": true,
+ "delivery": "at_most_once",
+ "retries": 0,
+ "view": {
+  "ws": "b3:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "root": "/srv/work/repo",
+  "cwd": "crates/app",
+  "mode": "fuse-userns",
+  "with": []
+ },
+ "spread": true
+}

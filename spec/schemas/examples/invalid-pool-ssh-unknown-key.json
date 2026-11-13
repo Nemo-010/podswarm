@@ -1,0 +1,5 @@
+{
+ "host": {
+  "lab1": {"road": "lab1", "ssh": {"max_sessions": 4, "control_persist_s": 60}}
+ }
+}

@@ -1,0 +1,380 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "$id": "https://podswarm.invalid/schemas/control-work.1.schema.json",
+ "title": "Control: attempt messages",
+ "description": "The messages that carry attempts on a link. Home: file 05, section 3. id_req and id_rep: file 17, section 6. A receiver ignores an object field that it does not know.",
+ "type": "object",
+ "required": ["t"],
+ "properties": {"t": {"enum": ["pull", "offer", "hb", "hback", "result", "ack", "cancel", "signal", "resize", "id_req", "id_rep"]}},
+ "oneOf": [
+  {
+   "type": "object",
+   "required": ["t", "free", "unstarted", "seen"],
+   "properties": {
+    "t": {"const": "pull"},
+    "free": {
+     "type": "object",
+     "required": ["slots", "cores_m", "mem_mib", "disk_mib"],
+     "properties": {
+      "slots": {"$ref": "#/$defs/u32"},
+      "cores_m": {"$ref": "#/$defs/u32"},
+      "mem_mib": {"$ref": "#/$defs/u64"},
+      "disk_mib": {"$ref": "#/$defs/u64"},
+      "res": {"type": "object", "additionalProperties": {"$ref": "#/$defs/u32"}}
+     }
+    },
+    "unstarted": {"$ref": "#/$defs/u32"},
+    "seen": {"$ref": "#/$defs/u64"},
+    "rtt_ms": {"$ref": "#/$defs/u32"}
+   },
+   "description": "Standing capacity of a worker (file 05, section 3; D-125)."
+  },
+  {
+   "type": "object",
+   "required": ["t", "no", "tasks"],
+   "properties": {
+    "t": {"const": "offer"},
+    "no": {"type": "integer", "minimum": 1, "maximum": 18446744073709551615},
+    "shapes": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "required": ["id", "spec"],
+      "properties": {"id": {"$ref": "#/$defs/u32"}, "spec": {"$ref": "https://podswarm.invalid/schemas/shape.1.schema.json"}}
+     }
+    },
+    "tasks": {"type": "array", "maxItems": 1000, "items": {"$ref": "https://podswarm.invalid/schemas/task-row.1.schema.json#/$defs/offer_row"}},
+    "refill": {"$ref": "#/$defs/u32", "description": "The unstarted count at which the worker pulls again (file 10)."}
+   },
+   "description": "Attempts for a worker (file 05, section 3). An empty offer is legal."
+  },
+  {
+   "type": "object",
+   "required": ["t", "seq", "seen", "hold"],
+   "properties": {
+    "t": {"const": "hb"},
+    "seq": {"$ref": "#/$defs/u64"},
+    "seen": {"$ref": "#/$defs/u64"},
+    "hold": {
+     "type": "array",
+     "maxItems": 8192,
+     "items": {
+      "type": "array",
+      "minItems": 3,
+      "prefixItems": [{"$ref": "#/$defs/u64"}, {"type": "integer", "minimum": 1, "maximum": 4294967295}, {"enum": ["q", "r", "d"]}]
+     }
+    },
+    "load": {
+     "type": "object",
+     "required": ["busy_m", "own_m", "mem_avail_mib", "disk_free_mib"],
+     "properties": {
+      "busy_m": {"$ref": "#/$defs/u64"},
+      "own_m": {"$ref": "#/$defs/u64"},
+      "mem_avail_mib": {"$ref": "#/$defs/u64"},
+      "disk_free_mib": {"$ref": "#/$defs/u64"}
+     }
+    },
+    "blobs": {"type": "array", "maxItems": 64, "items": {"$ref": "#/$defs/b3"}},
+    "lifetime_s": {"$ref": "#/$defs/u64"}
+   },
+   "description": "Heartbeat with the full holding (file 05, sections 3 and 6)."
+  },
+  {
+   "type": "object",
+   "required": ["t", "re"],
+   "properties": {"t": {"const": "hback"}, "re": {"$ref": "#/$defs/u64"}},
+   "description": "Answer to hb: re is the seq of the answered hb."
+  },
+  {
+   "type": "object",
+   "required": ["t", "batch"],
+   "properties": {"t": {"const": "result"}, "batch": {"type": "array", "minItems": 1, "maxItems": 1000, "items": {"$ref": "#/$defs/result_row"}}},
+   "description": "Ended attempts (file 05, section 3). At most 1,000 rows or 256 KiB."
+  },
+  {
+   "type": "object",
+   "required": ["t", "items"],
+   "properties": {
+    "t": {"const": "ack"},
+    "items": {
+     "type": "array",
+     "items": {
+      "type": "array",
+      "minItems": 3,
+      "prefixItems": [{"$ref": "#/$defs/u64"}, {"type": "integer", "minimum": 1, "maximum": 4294967295}, {"enum": ["accepted", "recorded", "dropped"]}]
+     }
+    }
+   }
+  },
+  {
+   "type": "object",
+   "required": ["t", "items", "mode"],
+   "properties": {
+    "t": {"const": "cancel"},
+    "items": {
+     "type": "array",
+     "minItems": 1,
+     "items": {"type": "array", "minItems": 2, "prefixItems": [{"$ref": "#/$defs/u64"}, {"type": "integer", "minimum": 1, "maximum": 4294967295}]}
+    },
+    "mode": {"enum": ["kill", "unstarted"]}
+   }
+  },
+  {
+   "type": "object",
+   "required": ["t", "task_id", "attempt_no", "sig"],
+   "properties": {
+    "t": {"const": "signal"},
+    "task_id": {"$ref": "#/$defs/u64"},
+    "attempt_no": {"type": "integer", "minimum": 1, "maximum": 4294967295},
+    "sig": {"$ref": "#/$defs/sig_name"}
+   }
+  },
+  {
+   "type": "object",
+   "required": ["t", "task_id", "attempt_no", "rows", "cols"],
+   "properties": {
+    "t": {"const": "resize"},
+    "task_id": {"$ref": "#/$defs/u64"},
+    "attempt_no": {"type": "integer", "minimum": 1, "maximum": 4294967295},
+    "rows": {"type": "integer", "minimum": 1, "maximum": 65535},
+    "cols": {"type": "integer", "minimum": 1, "maximum": 65535}
+   }
+  },
+  {
+   "type": "object",
+   "required": ["t", "task_id", "attempt_no", "aud"],
+   "properties": {
+    "t": {"const": "id_req"},
+    "task_id": {"$ref": "#/$defs/u64"},
+    "attempt_no": {"type": "integer", "minimum": 1, "maximum": 4294967295},
+    "aud": {"type": "string", "minLength": 1}
+   },
+   "description": "Run identity token request (file 17, section 6)."
+  },
+  {
+   "type": "object",
+   "required": ["t", "task_id", "attempt_no"],
+   "properties": {
+    "t": {"const": "id_rep"},
+    "task_id": {"$ref": "#/$defs/u64"},
+    "attempt_no": {"type": "integer", "minimum": 1, "maximum": 4294967295},
+    "token": {"type": "string", "pattern": "^[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+$"},
+    "err": {"$ref": "#/$defs/err_code", "description": "An error code of file 05, section 11."}
+   },
+   "oneOf": [{"required": ["token"]}, {"required": ["err"]}]
+  }
+ ],
+ "$defs": {
+  "b3": {"type": "string", "pattern": "^b3:[0-9a-f]{64}$", "description": "A content id: BLAKE3 (file 15)."},
+  "boundary": {"enum": ["none", "confined", "sandbox", "vm"]},
+  "err_code": {
+   "enum": [
+    "bad_request",
+    "bad_state",
+    "attempt_live",
+    "unauthorized",
+    "revoked",
+    "duplicate_identity",
+    "unsupported",
+    "busy",
+    "too_large",
+    "policy",
+    "needs_unsatisfiable",
+    "shield_unavailable",
+    "no_cell",
+    "wrong_cell",
+    "quota",
+    "not_found",
+    "internal"
+   ]
+  },
+  "hex16": {"type": "string", "pattern": "^[0-9a-f]{16}$"},
+  "outcome": {"enum": ["exited", "signaled", "timeout", "spawn_failed", "killed", "cancelled", "not_started", "checkpointed"]},
+  "relpath": {
+   "type": "string",
+   "maxLength": 1024,
+   "pattern": "^(?!(?:\\.[Ss][Ee][Cc][Rr][Ee][Tt][Ss]|[Tt][Mm][Pp]|\\.[Pp][Ss][Ww])(?:/|$))(?!(?:[Cc][Oo][Nn]|[Pp][Rr][Nn]|[Aa][Uu][Xx]|[Nn][Uu][Ll]|[Cc][Oo][Mm][0-9]|[Ll][Pp][Tt][0-9])(?:\\.|/|$))[^/\\x00-\\x1f\\x7f\\\\:*?\"<>|]{0,254}[^/\\x00-\\x1f\\x7f\\\\:*?\"<>|. ](?:/(?!(?:[Cc][Oo][Nn]|[Pp][Rr][Nn]|[Aa][Uu][Xx]|[Nn][Uu][Ll]|[Cc][Oo][Mm][0-9]|[Ll][Pp][Tt][0-9])(?:\\.|/|$))[^/\\x00-\\x1f\\x7f\\\\:*?\"<>|]{0,254}[^/\\x00-\\x1f\\x7f\\\\:*?\"<>|. ])*$",
+   "description": "The path rule of file 16, section 13 (items 1 to 8; item 9 spans paths)."
+  },
+  "shield": {"enum": ["none", "private", "guest", "sealed"]},
+  "shield_report": {
+   "type": "object",
+   "description": "The shield report of file 13, section 11.",
+   "required": ["asked", "got", "mode"],
+   "properties": {
+    "asked": {"$ref": "#/$defs/shield"},
+    "got": {"$ref": "#/$defs/shield"},
+    "mode": {"enum": ["claimed", "attested"]},
+    "area": {"enum": ["tmpfs-noswap", "ramfs-ns", "tmpfs-ns", "sealed-fuse", "runtime", null]},
+    "swap": {"enum": ["none", "locked", "possible"]},
+    "cache": {"type": "boolean"},
+    "store": {"enum": ["warm", "cold", "discarded"]},
+    "left": {"type": "array", "items": {"type": "string"}},
+    "net_exit": {"type": "string"},
+    "measurement": {"type": "string", "pattern": "^[0-9a-f]{96}$"},
+    "tcb": {"type": "string", "pattern": "^[0-9a-f]{16}$"},
+    "crl": {"enum": ["ok", "stale", "absent"]}
+   },
+   "$comment": "area is null at shield none."
+  },
+  "sig_name": {"enum": ["INT", "TERM", "HUP", "QUIT", "USR1", "USR2", "TSTP", "CONT", "WINCH"]},
+  "stream_part": {
+   "type": "object",
+   "required": ["len", "trunc", "enc"],
+   "properties": {
+    "len": {"$ref": "#/$defs/u64"},
+    "trunc": {"type": "boolean"},
+    "enc": {"enum": ["utf8", "base64"]},
+    "head": {"type": "string", "maxLength": 87384},
+    "tail": {"type": "string", "maxLength": 43692},
+    "id": {"$ref": "#/$defs/b3"}
+   },
+   "description": "Head and tail of one stream (file 12, section 9): enc is utf8 when both parts are UTF-8, else base64. Bounds: capture_max 65,536 bytes as base64."
+  },
+  "u32": {"type": "integer", "minimum": 0, "maximum": 4294967295},
+  "u64": {"type": "integer", "minimum": 0, "maximum": 18446744073709551615},
+  "unix": {"type": "integer", "minimum": 0, "description": "Unix seconds, wall clock."},
+  "result_row": {
+   "type": "array",
+   "minItems": 9,
+   "description": "A result row: [task_id, attempt_no, outcome, code, signal, wall_ms, user_ms, sys_ms, rss_kib, extra?] (file 05, section 3).",
+   "prefixItems": [
+    {"$ref": "#/$defs/u64"},
+    {"type": "integer", "minimum": 1, "maximum": 4294967295},
+    {"$ref": "#/$defs/outcome"},
+    {"type": ["integer", "null"], "minimum": 0, "maximum": 255},
+    {
+     "type": ["integer", "null"],
+     "minimum": 1,
+     "maximum": 127,
+     "description": "The number of the signal that ended the process, or null."
+    },
+    {"$ref": "#/$defs/u64"},
+    {"$ref": "#/$defs/u64"},
+    {"$ref": "#/$defs/u64"},
+    {"$ref": "#/$defs/u64"},
+    {"$ref": "#/$defs/result_extra"}
+   ],
+   "allOf": [
+    {
+     "if": {"prefixItems": [true, true, {"const": "exited"}], "minItems": 10},
+     "then": {
+      "prefixItems": [
+       true,
+       true,
+       true,
+       true,
+       true,
+       true,
+       true,
+       true,
+       true,
+       {"properties": {"reason": {"enum": ["output_failed", "output_rejected", "ckpt_failed"]}}}
+      ]
+     }
+    },
+    {
+     "if": {"prefixItems": [true, true, {"const": "signaled"}], "minItems": 10},
+     "then": {
+      "prefixItems": [
+       true,
+       true,
+       true,
+       true,
+       true,
+       true,
+       true,
+       true,
+       true,
+       {"properties": {"reason": {"enum": ["mem_exceeded", "cpu_exceeded", "disk_full", "area_full"]}}}
+      ]
+     }
+    },
+    {
+     "if": {"prefixItems": [true, true, {"const": "killed"}], "minItems": 10},
+     "then": {
+      "prefixItems": [
+       true,
+       true,
+       true,
+       true,
+       true,
+       true,
+       true,
+       true,
+       true,
+       {"properties": {"reason": {"enum": ["self_fence", "drain", "orphan_cleanup", "lifetime"]}}}
+      ]
+     }
+    },
+    {
+     "if": {"prefixItems": [true, true, {"const": "spawn_failed"}], "minItems": 10},
+     "then": {
+      "prefixItems": [
+       true,
+       true,
+       true,
+       true,
+       true,
+       true,
+       true,
+       true,
+       true,
+       {"properties": {"reason": {"enum": ["bad_argv", "isolation_refused", "policy", "input", "shape", "other"]}}}
+      ]
+     }
+    },
+    {
+     "if": {"prefixItems": [true, true, {"const": "not_started"}], "minItems": 10},
+     "then": {"prefixItems": [true, true, true, true, true, true, true, true, true, {"properties": {"reason": {"enum": ["disk", "needs_key"]}}}]}
+    },
+    {
+     "if": {"prefixItems": [true, true, {"const": "timeout"}], "minItems": 10},
+     "then": {"prefixItems": [true, true, true, true, true, true, true, true, true, {"not": {"required": ["reason"]}}]}
+    },
+    {
+     "if": {"prefixItems": [true, true, {"const": "cancelled"}], "minItems": 10},
+     "then": {"prefixItems": [true, true, true, true, true, true, true, true, true, {"not": {"required": ["reason"]}}]}
+    },
+    {
+     "if": {"prefixItems": [true, true, {"const": "checkpointed"}], "minItems": 10},
+     "then": {"prefixItems": [true, true, true, true, true, true, true, true, true, {"not": {"required": ["reason"]}}]}
+    },
+    {
+     "if": {"prefixItems": [true, true, {"enum": ["killed", "spawn_failed"]}]},
+     "then": {"minItems": 10, "prefixItems": [true, true, true, true, true, true, true, true, true, {"required": ["reason"]}]},
+     "$comment": "A killed or spawn_failed result names its reason (file 09, section 8)."
+    },
+    {
+     "if": {"prefixItems": [true, true, {"enum": ["exited", "checkpointed"]}]},
+     "then": {"prefixItems": [true, true, true, {"type": "integer"}]},
+     "$comment": "An exited or checkpointed result carries its exit code."
+    },
+    {"if": {"prefixItems": [true, true, {"const": "signaled"}]}, "then": {"prefixItems": [true, true, true, true, {"type": "integer"}]}}
+   ]
+  },
+  "result_extra": {
+   "type": "object",
+   "description": "Rare fields of a result row (file 05, section 3).",
+   "properties": {
+    "reason": {"type": "string"},
+    "out": {"$ref": "#/$defs/stream_part"},
+    "err": {"$ref": "#/$defs/stream_part"},
+    "outputs": {
+     "type": "array",
+     "maxItems": 256,
+     "items": {
+      "type": "object",
+      "required": ["path", "id", "size"],
+      "properties": {"path": {"$ref": "#/$defs/relpath"}, "id": {"$ref": "#/$defs/b3"}, "size": {"$ref": "#/$defs/u64"}}
+     }
+    },
+    "boundary": {"$ref": "#/$defs/boundary"},
+    "shield": {"$ref": "#/$defs/shield_report"},
+    "view": {"enum": ["fuse", "fuse-userns", "trap", "sync", "none"]},
+    "residual": {"$ref": "#/$defs/u32"},
+    "started_unix": {"$ref": "#/$defs/unix"}
+   }
+  }
+ }
+}

@@ -1,0 +1,15 @@
+RESULT workers=1000 bundle=10 dur=batched tail=true lease_wait=true ckpt=auto tasks=430000 wall=15.12s tasks_per_s=28435 mean_bundle=10.0
+  pull_lat_ms p50=163.79 p99=609.55  result_ack_lat_ms p50=175.80 p99=200.51
+  commits=86 commits_per_s=6 events_per_commit=1000.0 commit_ms p50=121.75 p99=558.10 max=558.10
+  cpu_s total=9.04 writer=7.36 sched=1.34 loadgen=0.34  coord_cores=0.58  rss_hwm_mib=17
+  VERIFY (python, outside): tasks state=5: 430000 results: 430000 attempts ended: 430000 dup accepted: 0 state3 left: 0
+RESULT workers=1000 bundle=1 dur=batched tail=true lease_wait=true ckpt=auto tasks=112000 wall=15.00s tasks_per_s=7465 mean_bundle=1.0
+  pull_lat_ms p50=61.42 p99=91.07  result_ack_lat_ms p50=60.39 p99=90.78
+  commits=224 commits_per_s=15 events_per_commit=1000.0 commit_ms p50=9.81 p99=40.30 max=460.96
+  cpu_s total=3.97 writer=2.55 sched=0.83 loadgen=0.59  coord_cores=0.23  rss_hwm_mib=15
+  VERIFY (python, outside): tasks state=5: 112000 results: 112000 attempts ended: 112000 dup accepted: 0 state3 left: 0
+RESULT workers=200 bundle=1 dur=strict tail=true lease_wait=false ckpt=auto tasks=222469 wall=15.01s tasks_per_s=14818 mean_bundle=1.0
+  pull_lat_ms p50=0.21 p99=0.53  result_ack_lat_ms p50=13.39 p99=30.12
+  commits=1739 commits_per_s=116 events_per_commit=255.9 commit_ms p50=6.87 p99=18.78 max=470.02
+  cpu_s total=8.03 writer=5.04 sched=1.75 loadgen=1.24  coord_cores=0.45  rss_hwm_mib=17
+  VERIFY (python, outside): tasks state=5: 222469 results: 222469 attempts ended: 222469 dup accepted: 0 state3 left: 0

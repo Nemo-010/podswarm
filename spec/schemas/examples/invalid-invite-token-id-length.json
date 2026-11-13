@@ -1,0 +1,13 @@
+{
+ "c": [
+  "coord.example:443"
+ ],
+ "a": [
+  "192.0.2.7"
+ ],
+ "k": "SHA256:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+ "i": "4f2a",
+ "s": "AAAAAAAAAAAAAAAAAAAAAA",
+ "w": "BBBBBBBBBBBBBBBBBBBBBB",
+ "x": 1794086400
+}

@@ -1,0 +1,24 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "$id": "https://podswarm.invalid/schemas/invite-token.1.schema.json",
+ "title": "Invite token payload",
+ "description": "The JSON object inside an invite token psw1.BASE64URL. Home: file 16, section 7.1. The pin k is the SHA256: fingerprint of the Ed25519 key of the coordinator (D-129).",
+ "type": "object",
+ "required": ["c", "k", "i", "s", "w", "x"],
+ "additionalProperties": false,
+ "properties": {
+  "c": {"type": "array", "minItems": 1, "items": {"type": "string", "pattern": "^[^\\s:]+:[0-9]{1,5}$|^\\[[0-9a-fA-F:]+\\]:[0-9]{1,5}$"}},
+  "a": {"type": "array", "items": {"type": "string", "minLength": 2}},
+  "k": {"$ref": "#/$defs/fingerprint"},
+  "i": {"$ref": "#/$defs/hex16"},
+  "s": {"type": "string", "pattern": "^[A-Za-z0-9_-]{22}$"},
+  "w": {"type": "string", "pattern": "^[A-Za-z0-9_-]{22}$"},
+  "x": {"$ref": "#/$defs/unix"}
+ },
+ "$comment": "s and w are base64url of 16 bytes with no padding (22 characters). ready.swarm of file 04 carries the bytes of w as 32 hex.",
+ "$defs": {
+  "fingerprint": {"type": "string", "pattern": "^SHA256:[A-Za-z0-9+/]{43}$", "description": "The SHA256: fingerprint form of pod_identity (D-129)."},
+  "hex16": {"type": "string", "pattern": "^[0-9a-f]{16}$"},
+  "unix": {"type": "integer", "minimum": 0, "description": "Unix seconds, wall clock."}
+ }
+}

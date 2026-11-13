@@ -1,0 +1,9 @@
+{
+ "schema": 1,
+ "argv": [
+  "make",
+  "-j8"
+ ],
+ "delivery": "at_most_once",
+ "retries": 1
+}

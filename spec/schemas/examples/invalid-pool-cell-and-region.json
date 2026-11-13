@@ -1,0 +1,9 @@
+{
+ "host": {
+  "a": {
+   "road": "a",
+   "cell": "eu",
+   "region": "eu-west"
+  }
+ }
+}

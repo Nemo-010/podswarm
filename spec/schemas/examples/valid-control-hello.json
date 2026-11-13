@@ -1,0 +1,44 @@
+{
+ "t": "hello",
+ "proto": [
+  1,
+  1
+ ],
+ "role": "worker",
+ "inst": "9f2c61d0a4b7e381",
+ "sw": "podswarm/0.2.0 x86_64-unknown-linux-musl",
+ "bin": {
+  "size": 8812344,
+  "sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+ },
+ "features": [
+  "zstd.1",
+  "tmpl.1",
+  "io.1",
+  "pty.1",
+  "attach.1",
+  "blob.1"
+ ],
+ "caps": {
+  "os": "linux",
+  "arch": "x86_64",
+  "cores": 8,
+  "mem_mib": 16384,
+  "slots": 8,
+  "speed": 1000,
+  "shell": {
+   "path": "/bin/sh",
+   "kind": "dash",
+   "start_us": 900
+  },
+  "view": [
+   "fuse-userns",
+   "sync"
+  ],
+  "pty": true
+ },
+ "tags": [
+  "lab"
+ ],
+ "lifetime_s": 7200
+}

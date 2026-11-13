@@ -1,0 +1,31 @@
+{
+ "t": "req",
+ "id": 1,
+ "op": "submit",
+ "name": "my run",
+ "weight": 1,
+ "shapes": [
+  {
+   "schema": 1,
+   "argv": [
+    "make",
+    "-j8"
+   ]
+  }
+ ],
+ "tasks": [
+  [
+   0,
+   0,
+   "a.mp4"
+  ],
+  [
+   0,
+   1,
+   "b.mp4",
+   {
+    "key": "b"
+   }
+  ]
+ ]
+}

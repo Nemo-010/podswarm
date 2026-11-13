@@ -1,0 +1,21 @@
+{
+ "id": 7,
+ "op": "admit",
+ "submitter": "SHA256:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+ "cell": "eu1",
+ "run": 12,
+ "shape": {
+  "needs": {
+   "cores_m": 1000
+  },
+  "timeout_s": 600,
+  "tags": {
+   "k": "v"
+  }
+ },
+ "usage": {
+  "running": 3,
+  "cores_m_running": 3000,
+  "open_runs": 1
+ }
+}

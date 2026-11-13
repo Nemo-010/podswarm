@@ -1,0 +1,14 @@
+{
+ "host": {
+  "build": {
+   "road": "ssh://build.example",
+   "trust": "shared",
+   "shield": "private",
+   "cache": true,
+   "leftovers": "bin",
+   "guest_tcg": false,
+   "seal_smt": true,
+   "area": "sealed"
+  }
+ }
+}

@@ -1,0 +1,7 @@
+{
+ "t": "ckpt_key_req",
+ "task_id": 41,
+ "attempt_no": 2,
+ "key_id": "0123456789abcdef",
+ "shield": {"asked": "private", "got": "private", "mode": "claimed", "area": "ramfs-ns", "cache": "yes"}
+}

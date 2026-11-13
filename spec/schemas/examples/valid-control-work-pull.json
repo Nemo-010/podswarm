@@ -1,0 +1,15 @@
+{
+ "t": "pull",
+ "free": {
+  "slots": 4,
+  "cores_m": 4000,
+  "mem_mib": 8192,
+  "disk_mib": 20480,
+  "res": {
+   "gpu": 1
+  }
+ },
+ "unstarted": 0,
+ "seen": 7,
+ "rtt_ms": 12
+}

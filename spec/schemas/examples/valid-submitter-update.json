@@ -1,0 +1,9 @@
+{
+ "t": "req",
+ "id": 7,
+ "op": "update",
+ "sel": {"run": 12, "tags": ["stage:enc"], "where": ["wall_ms > 60000"]},
+ "action": "priority",
+ "value": 50,
+ "dry_run": true
+}

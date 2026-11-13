@@ -1,0 +1,20 @@
+{
+ "schema": 1,
+ "kind": "event",
+ "seq": 9,
+ "id": "01JC3Z8Y5R6T7V8W9X0Y1Z2A3D",
+ "type": "scale.tick",
+ "time_unix": 1794000300,
+ "data": {
+  "classes": [
+   {
+    "class": 1,
+    "ready": 40,
+    "running": 8
+   }
+  ],
+  "workers": 8,
+  "free_slots": 0,
+  "eta_s": null
+ }
+}

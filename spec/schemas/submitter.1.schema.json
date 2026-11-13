@@ -1,0 +1,317 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "$id": "https://podswarm.invalid/schemas/submitter.1.schema.json",
+ "title": "Submitter operation",
+ "description": "A request, a reply, an error or an event of the submitter operations on the control stream. Home: file 05, section 9. The worker uses the same form for blob_have (file 15, section 2). A receiver ignores an object field that it does not know.",
+ "type": "object",
+ "required": ["t"],
+ "oneOf": [
+  {"$ref": "#/$defs/req"},
+  {"$ref": "#/$defs/rep"},
+  {"$ref": "#/$defs/err"},
+  {"$ref": "#/$defs/event"}
+ ],
+ "$defs": {
+  "err_code": {
+   "enum": [
+    "bad_request",
+    "bad_state",
+    "attempt_live",
+    "unauthorized",
+    "revoked",
+    "duplicate_identity",
+    "unsupported",
+    "busy",
+    "too_large",
+    "policy",
+    "needs_unsatisfiable",
+    "shield_unavailable",
+    "no_cell",
+    "wrong_cell",
+    "quota",
+    "not_found",
+    "internal"
+   ]
+  },
+  "reason_text": {"type": "string", "maxLength": 200, "description": "Reason text: 200 bytes, control characters escaped (file 05, section 10)."},
+  "u32": {"type": "integer", "minimum": 0, "maximum": 4294967295},
+  "u64": {"type": "integer", "minimum": 0, "maximum": 18446744073709551615},
+  "req_id": {"$ref": "#/$defs/u64", "description": "A u64 that the client chooses, unique on the link while the request is open."},
+  "task_id": {"$ref": "#/$defs/u64"},
+  "b3": {"type": "string", "pattern": "^b3k?:[0-9a-f]{64}$", "description": "A content id (file 15)."},
+  "fingerprint": {"type": "string", "pattern": "^SHA256:[A-Za-z0-9+/]{43}$"},
+  "ckpt_name": {"type": "string", "pattern": "^(?:[a-z0-9-]{1,32}/)?[0-9]+/[0-9]+/[0-9]+$", "description": "cell/run_id/task_id/seq (file 15, section 11)."},
+  "tag_kv": {"type": "string", "pattern": "^[A-Za-z0-9_.+-]{1,120}(?::[A-Za-z0-9_.+-]{1,120})?$"},
+  "sel": {
+   "type": "object",
+   "description": "The wire form of the selector of file 18. Parts combine with AND.",
+   "properties": {
+    "ids": {"type": "array", "items": {"$ref": "#/$defs/task_id"}},
+    "run": {"oneOf": [{"$ref": "#/$defs/u64"}, {"type": "string", "pattern": "^[A-Za-z0-9._-]{1,64}$"}]},
+    "tags": {"type": "array", "items": {"$ref": "#/$defs/tag_kv"}},
+    "where": {"type": "array", "items": {"type": "string", "minLength": 3}},
+    "state": {"type": "string"},
+    "group": {"$ref": "#/$defs/u32"},
+    "worker": {"$ref": "#/$defs/u32"},
+    "all": {"type": "boolean"}
+   }
+  },
+  "run_name": {"type": "string", "pattern": "^[A-Za-z0-9._-]{1,64}$"},
+  "run_weight": {"type": "integer", "minimum": 1, "maximum": 100},
+  "run_priority": {"type": "integer", "minimum": -100, "maximum": 100},
+  "run_max_running": {"type": "integer", "minimum": 1},
+  "run_halt": {
+   "type": "object",
+   "description": "Halt at n failed or lost tasks, or at pct percent; never both (file 05, section 9).",
+   "properties": {
+    "n": {"type": "integer", "minimum": 1},
+    "pct": {"type": "integer", "minimum": 1, "maximum": 100},
+    "mode": {"enum": ["drain", "now"], "default": "drain"}
+   },
+   "not": {"required": ["n", "pct"]}
+  },
+  "req_base": {
+   "type": "object",
+   "required": ["t", "id", "op"],
+   "properties": {"t": {"const": "req"}, "id": {"$ref": "#/$defs/req_id"}, "op": {"type": "string"}}
+  },
+  "req": {
+   "description": "A request (file 05, section 9).",
+   "allOf": [{"$ref": "#/$defs/req_base"}],
+   "oneOf": [
+    {
+     "required": ["shapes", "tasks"],
+     "properties": {
+      "op": {"const": "submit"},
+      "run_id": {"$ref": "#/$defs/u64"},
+      "name": {"$ref": "#/$defs/run_name"},
+      "weight": {"$ref": "#/$defs/run_weight"},
+      "priority": {"$ref": "#/$defs/run_priority"},
+      "max_running": {"$ref": "#/$defs/run_max_running"},
+      "halt": {"$ref": "#/$defs/run_halt"},
+      "shapes": {"type": "array", "items": {"$ref": "https://podswarm.invalid/schemas/shape.1.schema.json"}},
+      "tasks": {"type": "array", "minItems": 1, "items": {"$ref": "https://podswarm.invalid/schemas/task-row.1.schema.json#/$defs/submit_row"}}
+     },
+     "description": "At most 4 MiB per message (file 05, section 10)."
+    },
+    {
+     "properties": {
+      "op": {"const": "run_new"},
+      "name": {"$ref": "#/$defs/run_name"},
+      "weight": {"$ref": "#/$defs/run_weight"},
+      "priority": {"$ref": "#/$defs/run_priority"},
+      "max_running": {"$ref": "#/$defs/run_max_running"},
+      "halt": {"$ref": "#/$defs/run_halt"}
+     }
+    },
+    {"required": ["run_id"], "properties": {"op": {"const": "run_close"}, "run_id": {"$ref": "#/$defs/u64"}}},
+    {
+     "required": ["what"],
+     "properties": {
+      "op": {"const": "ls"},
+      "what": {"enum": ["tasks", "runs", "workers"]},
+      "sel": {"$ref": "#/$defs/sel"},
+      "fields": {"type": "array", "items": {"type": "string"}},
+      "limit": {"type": "integer", "minimum": 1, "maximum": 1000, "default": 1000},
+      "cursor": {"type": "string"}
+     }
+    },
+    {"required": ["task_id"], "properties": {"op": {"enum": ["show", "attach", "ckpt_ls"]}, "task_id": {"$ref": "#/$defs/task_id"}}},
+    {"required": ["sel"], "properties": {"op": {"const": "cancel"}, "sel": {"$ref": "#/$defs/sel"}, "dry_run": {"type": "boolean"}}},
+    {
+     "required": ["sel"],
+     "properties": {
+      "op": {"const": "retry"},
+      "sel": {"$ref": "#/$defs/sel"},
+      "only": {"enum": ["failed", "lost", "cancelled"]},
+      "fresh": {"type": "boolean"},
+      "force": {"type": "boolean"},
+      "dry_run": {"type": "boolean"}
+     }
+    },
+    {
+     "required": ["sel", "action"],
+     "properties": {
+      "op": {"const": "update"},
+      "sel": {"$ref": "#/$defs/sel"},
+      "action": {"enum": ["hold", "release", "tag", "untag", "priority", "pause", "unpause", "pin", "unpin", "purge"]},
+      "value": {"oneOf": [{"$ref": "#/$defs/tag_kv"}, {"type": "integer", "minimum": -100, "maximum": 100}]},
+      "dry_run": {"type": "boolean"}
+     },
+     "allOf": [
+      {"if": {"properties": {"action": {"enum": ["tag", "untag", "priority"]}}}, "then": {"required": ["value"]}}
+     ]
+    },
+    {"properties": {"op": {"const": "watch"}, "sel": {"$ref": "#/$defs/sel"}, "since": {"$ref": "#/$defs/u64"}}},
+    {
+     "required": ["task_id", "stream"],
+     "properties": {
+      "op": {"const": "logs"},
+      "task_id": {"$ref": "#/$defs/task_id"},
+      "attempt_no": {"type": "integer", "minimum": 1, "maximum": 4294967295},
+      "stream": {"enum": ["stdout", "stderr"]},
+      "offset": {"$ref": "#/$defs/u64", "default": 0},
+      "follow": {"type": "boolean", "default": false}
+     }
+    },
+    {
+     "required": ["task_id"],
+     "properties": {"op": {"const": "ckpt_save"}, "task_id": {"$ref": "#/$defs/task_id"}, "label": {"type": "string"}, "pin": {"type": "boolean"}}
+    },
+    {"required": ["name"], "properties": {"op": {"enum": ["ckpt_show", "ckpt_rm", "ckpt_export"]}, "name": {"$ref": "#/$defs/ckpt_name"}}},
+    {"required": ["name", "pin"], "properties": {"op": {"const": "ckpt_pin"}, "name": {"$ref": "#/$defs/ckpt_name"}, "pin": {"type": "boolean"}}},
+    {
+     "required": ["task_id", "manifest"],
+     "properties": {"op": {"const": "ckpt_import"}, "task_id": {"$ref": "#/$defs/task_id"}, "manifest": {"$ref": "#/$defs/b3"}}
+    },
+    {
+     "properties": {
+      "op": {"const": "usage"},
+      "since": {"$ref": "#/$defs/u64"},
+      "since_unix": {"$ref": "#/$defs/u64"},
+      "by": {"type": "string", "pattern": "^(?:submitter|run|boundary|tag:[A-Za-z0-9_.+-]{1,120})$"}
+     }
+    },
+    {
+     "required": ["ids"],
+     "properties": {"op": {"const": "blob_have"}, "ids": {"type": "array", "maxItems": 10000, "items": {"$ref": "#/$defs/b3"}}},
+     "description": "A worker may ask up to 10,000 ids in one request (file 15, section 2)."
+    },
+    {
+     "properties": {
+      "op": {"const": "invite_new"},
+      "uses": {"type": "integer", "minimum": 1},
+      "ttl_s": {"$ref": "#/$defs/u64"},
+      "tags": {"type": "array", "items": {"type": "string"}},
+      "max_cores": {"$ref": "#/$defs/u32"},
+      "max_slots": {"$ref": "#/$defs/u32"},
+      "max_boundary": {"enum": ["none", "confined", "sandbox", "vm"]},
+      "approve": {"type": "boolean"},
+      "worker_ttl_s": {"$ref": "#/$defs/u64"},
+      "ephemeral": {"type": "boolean"}
+     }
+    },
+    {
+     "required": ["invite_id"],
+     "properties": {"op": {"const": "invite_revoke"}, "invite_id": {"type": "string", "pattern": "^[0-9a-f]{16}$"}, "cascade": {"type": "boolean"}}
+    },
+    {
+     "properties": {
+      "op": {"enum": ["worker_drain", "worker_undrain", "worker_revoke", "worker_approve"]},
+      "wid": {"$ref": "#/$defs/u32"},
+      "sel": {"$ref": "#/$defs/sel"}
+     },
+     "oneOf": [{"required": ["wid"]}, {"required": ["sel"]}]
+    },
+    {
+     "properties": {
+      "op": {"const": "worker_tag"},
+      "wid": {"$ref": "#/$defs/u32"},
+      "sel": {"$ref": "#/$defs/sel"},
+      "add": {"type": "array", "items": {"$ref": "#/$defs/tag_kv"}},
+      "remove": {"type": "array", "items": {"$ref": "#/$defs/tag_kv"}}
+     },
+     "oneOf": [{"required": ["wid"]}, {"required": ["sel"]}]
+    },
+    {
+     "required": ["key"],
+     "properties": {
+      "op": {"const": "submitter_add"},
+      "key": {"oneOf": [{"type": "string", "pattern": "^[0-9a-f]{64}$"}, {"$ref": "#/$defs/fingerprint"}]},
+      "name": {"type": "string", "minLength": 1, "maxLength": 64},
+      "scopes": {"type": "array", "items": {"enum": ["read", "submit", "id", "admin", "verify"]}},
+      "routes": {"type": "array", "items": {"type": "string"}},
+      "quota": {"type": "object", "additionalProperties": {"$ref": "#/$defs/u64"}},
+      "id_aud": {"type": "array", "items": {"type": "string"}}
+     }
+    },
+    {"required": ["fingerprint"], "properties": {"op": {"const": "submitter_rm"}, "fingerprint": {"$ref": "#/$defs/fingerprint"}}},
+    {
+     "required": ["key", "name", "max_scopes", "routes", "max_life_s"],
+     "properties": {
+      "op": {"const": "org_add"},
+      "key": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+      "name": {"type": "string", "minLength": 1, "maxLength": 64},
+      "max_scopes": {"type": "array", "items": {"type": "string"}},
+      "routes": {"type": "array", "items": {"type": "string"}},
+      "max_life_s": {"type": "integer", "minimum": 1},
+      "allow_admin": {"type": "boolean"}
+     }
+    },
+    {"required": ["key"], "properties": {"op": {"const": "org_rm"}, "key": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}},
+    {"required": ["member"], "properties": {"op": {"const": "org_revoke"}, "member": {"$ref": "#/$defs/fingerprint"}}},
+    {"properties": {"op": {"enum": ["invite_ls", "submitter_ls", "org_ls", "status", "gc", "version"]}}}
+   ]
+  },
+  "rep": {
+   "type": "object",
+   "required": ["t", "id", "ok"],
+   "description": "A reply. ok is always true; a failure is err. Reply fields by operation: file 05, section 9.",
+   "properties": {
+    "t": {"const": "rep"},
+    "id": {"$ref": "#/$defs/req_id"},
+    "ok": {"const": true},
+    "run_id": {"$ref": "#/$defs/u64"},
+    "first_task_id": {"$ref": "#/$defs/u64"},
+    "dup": {
+     "type": "array",
+     "items": {"type": "array", "minItems": 2, "maxItems": 2, "prefixItems": [{"$ref": "#/$defs/u32"}, {"$ref": "#/$defs/task_id"}]},
+     "description": "[pos, task_id]: the position in tasks[] of a row whose (run, key) exists, and the existing task."
+    },
+    "rows": {"type": "array", "items": {"type": "object"}},
+    "row": {"type": "object"},
+    "cursor": {"type": "string"},
+    "task": {"type": "object"},
+    "attempts": {"type": "array", "items": {"type": "object"}},
+    "result": {"type": ["object", "null"]},
+    "count": {"$ref": "#/$defs/u64"},
+    "ids": {"type": "array", "items": {"oneOf": [{"$ref": "#/$defs/u64"}, {"$ref": "#/$defs/b3"}]}},
+    "name": {"$ref": "#/$defs/ckpt_name"},
+    "manifest": {"$ref": "#/$defs/b3"},
+    "next": {"$ref": "#/$defs/u64"},
+    "have": {"type": "array", "items": {"$ref": "#/$defs/b3"}},
+    "invite_id": {"type": "string", "pattern": "^[0-9a-f]{16}$"},
+    "token": {"type": "string", "pattern": "^psw1\\.[A-Za-z0-9_-]+$"},
+    "fingerprint": {"$ref": "#/$defs/fingerprint"},
+    "connect": {"type": "string", "pattern": "^psw1s\\.[A-Za-z0-9_-]+$"},
+    "counters": {"type": "object", "additionalProperties": {"$ref": "#/$defs/u64"}},
+    "counts": {"type": "object", "additionalProperties": {"$ref": "#/$defs/u64"}},
+    "sw": {"type": "string"},
+    "proto": {"type": "integer", "minimum": 1},
+    "features": {"type": "array", "items": {"type": "string", "pattern": "^[a-z][a-z0-9_]*\\.[0-9]+$"}}
+   }
+  },
+  "err": {
+   "type": "object",
+   "required": ["t", "id", "code", "text"],
+   "description": "An error answer: err{id, code, text, ...} with the fields of file 05, section 3.",
+   "properties": {
+    "t": {"const": "err"},
+    "id": {"$ref": "#/$defs/req_id"},
+    "code": {"$ref": "#/$defs/err_code"},
+    "text": {"$ref": "#/$defs/reason_text"},
+    "fatal": {"type": "boolean", "default": false},
+    "retry_after_ms": {"$ref": "#/$defs/u64"},
+    "items": {"type": "array"},
+    "limit": {"type": "integer"},
+    "used": {"type": "integer"},
+    "scope": {"enum": ["submitter", "swarm"]},
+    "reason": {"type": "string"},
+    "asked": {"enum": ["none", "private", "guest", "sealed"]},
+    "max": {"enum": ["none", "private", "guest", "sealed"]},
+    "field": {"type": "string"},
+    "cell": {"type": "string", "pattern": "^[a-z0-9-]{1,32}$"}
+   }
+  },
+  "event": {
+   "type": "object",
+   "required": ["t", "sub", "ev"],
+   "description": "An event of a subscription: event{sub, ev}.",
+   "properties": {
+    "t": {"const": "event"},
+    "sub": {"$ref": "#/$defs/req_id", "description": "The id of the watch request."},
+    "ev": {"$ref": "https://podswarm.invalid/schemas/event.1.schema.json"}
+   }
+  }
+ }
+}

@@ -1,0 +1,14 @@
+{
+ "t": "ckpt_commit",
+ "task_id": 41,
+ "attempt_no": 1,
+ "seq": 4,
+ "manifest": "b3:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+ "bytes": 1048576,
+ "files": 12,
+ "kind": "git",
+ "label": "epoch-4",
+ "skipped": [
+  ".env"
+ ]
+}

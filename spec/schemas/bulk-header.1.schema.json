@@ -1,0 +1,162 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "$id": "https://podswarm.invalid/schemas/bulk-header.1.schema.json",
+ "title": "Bulk stream header",
+ "description": "The JSON line that starts a bulk stream, and the JSON line of the receiver of a blob transfer. Home: file 05, section 7 (the table); fields: file 05 section 5 (io), file 15 section 2 (blob_put, blob_get and the answers), file 06 section 6.1 (view), file 14 (net), file 07 section 8 (exec).",
+ "oneOf": [
+  {
+   "type": "object",
+   "required": ["t"],
+   "oneOf": [
+    {
+     "type": "object",
+     "required": ["t", "task_id", "attempt_no", "ch", "offset"],
+     "properties": {
+      "t": {"const": "io"},
+      "task_id": {"$ref": "#/$defs/u64"},
+      "attempt_no": {"type": "integer", "minimum": 1, "maximum": 4294967295},
+      "ch": {"enum": ["stdin", "stdout", "stderr", "tty"]},
+      "offset": {"$ref": "#/$defs/u64"}
+     },
+     "description": "A stream of an attached or followed attempt (file 05, section 5)."
+    },
+    {
+     "type": "object",
+     "required": ["t", "id", "size", "offset", "enc"],
+     "properties": {
+      "t": {"const": "blob_put"},
+      "id": {"$ref": "#/$defs/blob_id"},
+      "size": {"$ref": "#/$defs/u64"},
+      "offset": {"$ref": "#/$defs/u64"},
+      "enc": {"enum": ["raw", "zstd"]}
+     },
+     "description": "One blob to the receiver (file 15, section 2). size is at most blob_max_mib. len is for blob_get only."
+    },
+    {
+     "type": "object",
+     "required": ["t", "id", "offset", "enc"],
+     "properties": {
+      "t": {"const": "blob_get"},
+      "id": {"$ref": "#/$defs/blob_id"},
+      "offset": {"$ref": "#/$defs/u64"},
+      "len": {"$ref": "#/$defs/u64"},
+      "enc": {"enum": ["raw", "zstd"]}
+     },
+     "description": "A range of one blob from the receiver (file 15, section 2)."
+    },
+    {
+     "type": "object",
+     "required": ["t", "ws", "ch"],
+     "properties": {"t": {"const": "view"}, "ws": {"$ref": "#/$defs/b3"}, "ch": {"enum": ["ctl", "data"]}, "prio": {"enum": ["demand", "prefetch", "wb"]}},
+     "description": "The view protocol (file 06, section 6.1).",
+     "allOf": [{"if": {"properties": {"ch": {"const": "data"}}}, "then": {"required": ["prio"]}}]
+    },
+    {
+     "type": "object",
+     "required": ["t", "task_id", "attempt_no", "proto", "dst", "member"],
+     "properties": {
+      "t": {"const": "net"},
+      "task_id": {"$ref": "#/$defs/u64"},
+      "attempt_no": {"type": "integer", "minimum": 1, "maximum": 4294967295},
+      "proto": {"enum": ["tcp", "udp"]},
+      "dst": {
+       "type": "string",
+       "pattern": "^(?:[A-Za-z0-9](?:[A-Za-z0-9.-]{0,251}[A-Za-z0-9])?|[0-9]{1,3}(?:\\.[0-9]{1,3}){3}|\\[[0-9A-Fa-f:.]{2,45}\\]):[0-9]{1,5}$",
+       "description": "NAME:PORT, IPV4:PORT or [IPV6]:PORT."
+      },
+      "member": {"type": "string", "pattern": "^(?:direct|[a-z0-9][a-z0-9_-]{0,31})$", "description": "A machine name of the pool, or direct."}
+     },
+     "description": "One network flow of an attempt (file 14, section 5; D-79)."
+    },
+    {
+     "type": "object",
+     "required": ["t", "sess", "proc", "role", "rx", "tx"],
+     "properties": {
+      "t": {"const": "exec"},
+      "sess": {"$ref": "#/$defs/u64", "description": "The spread session id."},
+      "proc": {"$ref": "#/$defs/u64"},
+      "role": {"enum": ["stub", "member"]},
+      "rx": {"$ref": "#/$defs/u64"},
+      "tx": {"$ref": "#/$defs/u64"}
+     },
+     "description": "One moved process of a spread session (file 07, section 8; D-117). The frames after the header, and the fields of the req body, are in file 07, section 8."
+    }
+   ],
+   "description": "A header line."
+  },
+  {
+   "type": "object",
+   "required": ["ok"],
+   "oneOf": [
+    {
+     "type": "object",
+     "required": ["ok", "have"],
+     "additionalProperties": false,
+     "properties": {"ok": {"const": true}, "have": {"$ref": "#/$defs/u64"}},
+     "description": "Put: the receiver holds have bytes."
+    },
+    {
+     "type": "object",
+     "required": ["ok", "done"],
+     "additionalProperties": false,
+     "properties": {"ok": {"const": true}, "done": {"const": true}},
+     "description": "Put: the owner already holds the blob."
+    },
+    {
+     "type": "object",
+     "required": ["ok", "size", "len", "enc"],
+     "additionalProperties": false,
+     "properties": {"ok": {"const": true}, "size": {"$ref": "#/$defs/u64"}, "len": {"$ref": "#/$defs/u64"}, "enc": {"enum": ["raw", "zstd"]}},
+     "description": "Get: then len bytes."
+    },
+    {
+     "type": "object",
+     "required": ["ok", "code"],
+     "properties": {
+      "ok": {"const": false},
+      "code": {"$ref": "#/$defs/err_code"},
+      "have": {"$ref": "#/$defs/u64"},
+      "reason": {"type": "string"},
+      "limit": {"type": "integer"},
+      "used": {"type": "integer"},
+      "scope": {"enum": ["submitter", "swarm"]}
+     },
+     "description": "A refusal with an error code of file 05."
+    }
+   ],
+   "description": "An answer line of a blob transfer."
+  }
+ ],
+ "$comment": "A header line has at most 4,096 bytes and ends with a newline.",
+ "$defs": {
+  "b3": {"type": "string", "pattern": "^b3:[0-9a-f]{64}$", "description": "A content id: BLAKE3 (file 15)."},
+  "blob_id": {
+   "type": "string",
+   "pattern": "^b3k?:[0-9a-f]{64}$",
+   "description": "A blob id: b3: or, for an encrypted checkpoint, b3k: (file 15, section 11.10)."
+  },
+  "err_code": {
+   "enum": [
+    "bad_request",
+    "bad_state",
+    "attempt_live",
+    "unauthorized",
+    "revoked",
+    "duplicate_identity",
+    "unsupported",
+    "busy",
+    "too_large",
+    "policy",
+    "needs_unsatisfiable",
+    "shield_unavailable",
+    "no_cell",
+    "wrong_cell",
+    "quota",
+    "not_found",
+    "internal"
+   ]
+  },
+  "u32": {"type": "integer", "minimum": 0, "maximum": 4294967295},
+  "u64": {"type": "integer", "minimum": 0, "maximum": 18446744073709551615}
+ }
+}

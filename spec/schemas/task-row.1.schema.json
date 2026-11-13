@@ -1,0 +1,109 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "$id": "https://podswarm.invalid/schemas/task-row.1.schema.json",
+ "title": "Task row",
+ "description": "A task row as a positional array. Home: file 05, section 3 (offer row) and section 9 (submit row); task fields: file 09, section 3.2.",
+ "anyOf": [{"$ref": "#/$defs/offer_row"}, {"$ref": "#/$defs/submit_row"}],
+ "$defs": {
+  "b3": {"type": "string", "pattern": "^b3:[0-9a-f]{64}$", "description": "A content id: BLAKE3 (file 15)."},
+  "blob_id": {
+   "type": "string",
+   "pattern": "^b3k?:[0-9a-f]{64}$",
+   "description": "A blob id: b3: or, for an encrypted checkpoint, b3k: (file 15, section 11.10)."
+  },
+  "hex16": {"type": "string", "pattern": "^[0-9a-f]{16}$"},
+  "tag": {"type": "string", "pattern": "^[A-Za-z0-9_.+-]{1,120}$"},
+  "tags_map": {
+   "type": "object",
+   "propertyNames": {"$ref": "#/$defs/tag"},
+   "additionalProperties": {"type": "string", "pattern": "^[A-Za-z0-9_.+-]{0,120}$"},
+   "description": "Tag name to value (file 09, section 3.3). A tag with no value has the empty string as its value."
+  },
+  "u32": {"type": "integer", "minimum": 0, "maximum": 4294967295},
+  "u64": {"type": "integer", "minimum": 0, "maximum": 18446744073709551615},
+  "unix": {"type": "integer", "minimum": 0, "description": "Unix seconds, wall clock."},
+  "offer_row": {
+   "type": "array",
+   "description": "An offer task row: [task_id, attempt_no, shape_id, idx, input, extra?] (file 05, section 3).",
+   "minItems": 5,
+   "prefixItems": [
+    {"$ref": "#/$defs/u64", "description": "task_id"},
+    {"type": "integer", "minimum": 1, "maximum": 4294967295, "description": "attempt_no"},
+    {"$ref": "#/$defs/u32", "description": "shape_id"},
+    {"$ref": "#/$defs/u32", "description": "idx"},
+    {"type": "string", "description": "input"},
+    {"$ref": "#/$defs/offer_extra"}
+   ],
+   "$comment": "A receiver ignores a trailing element that it does not know. The task record (input, fields, tags) has at most 16,384 bytes."
+  },
+  "offer_extra": {
+   "type": "object",
+   "description": "Rare fields of an offer row (file 05, section 3). A receiver ignores an unknown field.",
+   "properties": {
+    "fields": {"type": "object"},
+    "tags": {"$ref": "#/$defs/tags_map"},
+    "group": {"$ref": "#/$defs/u32"},
+    "key": {"type": "string", "pattern": "^(?!\\.\\.?$)[A-Za-z0-9._-]{1,128}$", "description": "Idempotency key (file 09, section 2)."},
+    "slot": {
+     "$ref": "#/$defs/u32",
+     "description": "The slot from 0 (TASK_SLOT of file 12)."
+    },
+    "vepoch": {"$ref": "#/$defs/u64"},
+    "ckpt": {
+     "type": "object",
+     "required": ["seq", "manifest", "bytes", "files"],
+     "properties": {
+      "seq": {"type": "integer", "minimum": 1, "maximum": 4294967295},
+      "manifest": {"$ref": "#/$defs/blob_id"},
+      "bytes": {"$ref": "#/$defs/u64"},
+      "files": {"$ref": "#/$defs/u64"},
+      "key_id": {"$ref": "#/$defs/hex16"},
+      "ref": {"type": "string"}
+     },
+     "description": "The checkpoint to restore (file 15, section 11.6)."
+    },
+    "secrets": {"$comment": "File 24."},
+    "tty": {
+     "type": "object",
+     "required": ["rows", "cols", "term"],
+     "properties": {
+      "rows": {"type": "integer", "minimum": 1, "maximum": 65535},
+      "cols": {"type": "integer", "minimum": 1, "maximum": 65535},
+      "term": {"type": "string"}
+     }
+    }
+   }
+  },
+  "submit_row": {
+   "type": "array",
+   "description": "A submit task row: [shape_ref, idx, input, extra?] (file 05, section 9).",
+   "minItems": 3,
+   "prefixItems": [
+    {
+     "oneOf": [{"$ref": "#/$defs/u32"}, {"$ref": "#/$defs/b3"}],
+     "description": "shape_ref: an index from 0 into shapes[] of the same message, or the b3: id of a shape that the owner stored (file 05, section 9)."
+    },
+    {"$ref": "#/$defs/u32", "description": "idx"},
+    {"type": "string", "description": "input"},
+    {"$ref": "#/$defs/submit_extra"}
+   ]
+  },
+  "submit_extra": {
+   "type": "object",
+   "description": "Task fields of file 09, section 3.2.",
+   "properties": {
+    "fields": {"type": "object"},
+    "tags": {"$ref": "#/$defs/tags_map"},
+    "group": {"$ref": "#/$defs/u32"},
+    "key": {"type": "string", "pattern": "^(?!\\.\\.?$)[A-Za-z0-9._-]{1,128}$", "description": "Idempotency key (file 09, section 2)."},
+    "not_before_unix": {"$ref": "#/$defs/unix"},
+    "deadline_unix": {"$ref": "#/$defs/unix"},
+    "kind": {"not": {}, "$comment": "Reserved (file 09, section 3.1): unsupported."},
+    "verifies": {"not": {}, "$comment": "Reserved (file 09, section 3.1): unsupported."},
+    "avoid": {"not": {}, "$comment": "Reserved (file 09, section 3.1): unsupported."},
+    "up_task": {"not": {}, "$comment": "Reserved (file 09, section 3.1): unsupported."},
+    "up_attempt": {"not": {}, "$comment": "Reserved (file 09, section 3.1): unsupported."}
+   }
+  }
+ }
+}

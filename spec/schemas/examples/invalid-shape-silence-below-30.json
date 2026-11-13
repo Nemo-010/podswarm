@@ -1,0 +1,8 @@
+{
+ "schema": 1,
+ "argv": [
+  "make",
+  "-j8"
+ ],
+ "silence_s": 10
+}

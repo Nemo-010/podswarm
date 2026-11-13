@@ -1,0 +1,57 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "$id": "https://podswarm.invalid/schemas/run-claims.1.schema.json",
+ "title": "Run identity claims",
+ "description": "The claims of a run identity token (JWT, ES256 from a coordinator, EdDSA from a home). Home: file 17, section 6.",
+ "type": "object",
+ "required": ["iss", "sub", "aud", "iat", "nbf", "exp", "jti", "run_id", "task_id", "attempt_no", "worker", "boundary", "shield", "shape", "sub_key"],
+ "properties": {
+  "iss": {"type": "string", "minLength": 1},
+  "aud": {"type": "string", "minLength": 1},
+  "sub": {
+   "type": "string",
+   "pattern": "^podswarm:(?:[a-z0-9-]{1,32})?:run:[0-9]+:task:[0-9]+$",
+   "description": "podswarm:CELL:run:RUN:task:TASK; in a session the cell part is empty (file 17, section 6)."
+  },
+  "iat": {"$ref": "#/$defs/unix"},
+  "nbf": {"$ref": "#/$defs/unix"},
+  "exp": {"$ref": "#/$defs/unix"},
+  "jti": {"type": "string", "pattern": "^[A-Za-z0-9_-]{22}$"},
+  "cell": {"$ref": "#/$defs/label"},
+  "run_id": {"$ref": "#/$defs/u64"},
+  "task_id": {"$ref": "#/$defs/u64"},
+  "attempt_no": {"type": "integer", "minimum": 1, "maximum": 4294967295},
+  "worker": {"$ref": "#/$defs/u32"},
+  "boundary": {"$ref": "#/$defs/boundary"},
+  "shield": {"$ref": "#/$defs/shield"},
+  "juris": {"$ref": "#/$defs/label"},
+  "shape": {"type": "string", "pattern": "^[0-9a-f]{16}$", "description": "The first 16 hex of the shape id."},
+  "sub_key": {"$ref": "#/$defs/fingerprint"},
+  "org": {"$ref": "#/$defs/fingerprint"},
+  "ws": {"type": "string"},
+  "ref": {"type": "string"}
+ },
+ "allOf": [
+  {
+   "if": {"properties": {"iss": {"pattern": "^key:"}}},
+   "then": {"not": {"required": ["cell"]}, "properties": {"sub": {"pattern": "^podswarm::"}}},
+   "else": {"required": ["cell"], "properties": {"sub": {"pattern": "^podswarm:[a-z0-9-]"}}},
+   "$comment": "A session token (iss key:SHA256:FP) has no cell, and its sub has an empty cell part."
+  }
+ ],
+ "$comment": "exp - iat is at most id.max_ttl_s (60 to 86,400); not expressible here.",
+ "$defs": {
+  "boundary": {"enum": ["none", "confined", "sandbox", "vm"]},
+  "fingerprint": {"type": "string", "pattern": "^SHA256:[A-Za-z0-9+/]{43}$", "description": "The SHA256: fingerprint form of pod_identity (D-129)."},
+  "label": {"type": "string", "pattern": "^[a-z0-9-]{1,32}$", "description": "A cell, region or juris label (file 08)."},
+  "shield": {"enum": ["none", "private", "guest", "sealed"]},
+  "u32": {"type": "integer", "minimum": 0, "maximum": 4294967295},
+  "u64": {"type": "integer", "minimum": 0, "maximum": 18446744073709551615},
+  "unix": {"type": "integer", "minimum": 0, "description": "Unix seconds, wall clock."},
+  "header": {
+   "type": "object",
+   "required": ["alg", "typ", "kid"],
+   "properties": {"alg": {"enum": ["ES256", "EdDSA"]}, "typ": {"const": "JWT"}, "kid": {"type": "string", "pattern": "^[0-9a-f]{8}$"}}
+  }
+ }
+}

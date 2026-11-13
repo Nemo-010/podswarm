@@ -1,0 +1,60 @@
+{
+ "t": "result",
+ "batch": [
+  [
+   41,
+   1,
+   "exited",
+   0,
+   null,
+   8123,
+   15010,
+   820,
+   912340,
+   {
+    "out": {
+     "len": 12,
+     "trunc": false,
+     "enc": "utf8",
+     "head": "hello world\n"
+    },
+    "outputs": [
+     {
+      "path": "out/a.webm",
+      "id": "b3:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "size": 1000
+     }
+    ],
+    "boundary": "none"
+   }
+  ],
+  [
+   42,
+   1,
+   "killed",
+   null,
+   9,
+   3000,
+   100,
+   10,
+   5000,
+   {
+    "reason": "self_fence"
+   }
+  ],
+  [
+   43,
+   2,
+   "signaled",
+   null,
+   9,
+   4000,
+   3900,
+   50,
+   8000000,
+   {
+    "reason": "mem_exceeded"
+   }
+  ]
+ ]
+}

@@ -1,0 +1,17 @@
+{
+ "schema": 1,
+ "kind": "event",
+ "id": "01JC3Z8Y5R6T7V8W9X0Y1Z2A3C",
+ "type": "run.end",
+ "time_unix": 1,
+ "data": {
+  "state": "done",
+  "counts": {
+   "succeeded": 1,
+   "failed": 0,
+   "cancelled": 0,
+   "lost": 0
+  },
+  "wall_ms": 1
+ }
+}

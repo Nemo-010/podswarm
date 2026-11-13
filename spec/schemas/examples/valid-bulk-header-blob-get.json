@@ -1,0 +1,7 @@
+{
+ "t": "blob_get",
+ "id": "b3k:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+ "offset": 0,
+ "len": 1024,
+ "enc": "zstd"
+}

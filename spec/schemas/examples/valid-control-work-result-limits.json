@@ -1,0 +1,8 @@
+{
+ "t": "result",
+ "batch": [
+  [44, 1, "signaled", null, 9, 2000, 1900, 30, 70000, {"reason": "area_full", "shield": {"asked": "private", "got": "private", "mode": "claimed", "area": "tmpfs-noswap", "cache": true, "store": "warm"}}],
+  [45, 1, "not_started", null, null, 0, 0, 0, 0, {"reason": "needs_key"}],
+  [46, 1, "exited", 0, null, 10, 5, 1, 900, {"shield": {"asked": "none", "got": "none", "mode": "claimed", "area": null, "cache": false}}]
+ ]
+}

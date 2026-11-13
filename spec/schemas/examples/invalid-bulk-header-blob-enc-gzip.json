@@ -1,0 +1,7 @@
+{
+ "t": "blob_put",
+ "id": "b3:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+ "size": 4096,
+ "offset": 0,
+ "enc": "gzip"
+}

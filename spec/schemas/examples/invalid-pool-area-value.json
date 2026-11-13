@@ -1,0 +1,9 @@
+{
+ "host": {
+  "build": {
+   "road": "ssh://build.example",
+   "shield": "private",
+   "area": "disk"
+  }
+ }
+}

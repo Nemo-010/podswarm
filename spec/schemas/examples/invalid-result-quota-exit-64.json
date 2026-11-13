@@ -1,0 +1,13 @@
+{
+ "schema": 1,
+ "kind": "error",
+ "error": {
+  "code": "quota",
+  "text": "max_running reached",
+  "exit": 64,
+  "retry": "no",
+  "scope": "submitter",
+  "limit": 64,
+  "used": 64
+ }
+}

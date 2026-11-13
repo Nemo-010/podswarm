@@ -1,0 +1,8 @@
+{
+ "t": "net",
+ "task_id": 41,
+ "attempt_no": 1,
+ "proto": "udp",
+ "dst": "[2001:db8::7]:53",
+ "member": "direct"
+}

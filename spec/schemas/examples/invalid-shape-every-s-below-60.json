@@ -1,0 +1,5 @@
+{
+ "schema": 1,
+ "argv": ["train.sh"],
+ "checkpoint": {"exit_code": 85, "every_s": 30}
+}

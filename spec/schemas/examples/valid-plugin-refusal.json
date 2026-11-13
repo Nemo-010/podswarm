@@ -1,0 +1,7 @@
+{
+ "id": 7,
+ "ok": false,
+ "code": "refused",
+ "reason": "credit_exhausted",
+ "text": "no credit"
+}

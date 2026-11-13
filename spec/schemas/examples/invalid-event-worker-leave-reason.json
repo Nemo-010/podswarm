@@ -1,0 +1,12 @@
+{
+ "schema": 1,
+ "kind": "event",
+ "id": "01JC3Z8Y5R6T7V8W9X0Y1Z2A3E",
+ "type": "worker.leave",
+ "time_unix": 1,
+ "data": {
+  "wid": 3,
+  "reason": "crash",
+  "attempts_lost": 0
+ }
+}

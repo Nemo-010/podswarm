@@ -1,0 +1,96 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "$id": "https://podswarm.invalid/schemas/workspace.1.schema.json",
+ "title": "Workspace file",
+ "description": "The workspace file .podswarm.toml as parsed data. Home: file 19, section 2, and file 16, section 11. [residency]: file 08, section 8.4. [view]: file 06, section 18.",
+ "type": "object",
+ "additionalProperties": false,
+ "properties": {"defaults": {"$ref": "#/$defs/defaults"}, "residency": {"$ref": "#/$defs/residency"}, "view": {"$ref": "#/$defs/view"}},
+ "$comment": "A workspace file sets [defaults], [residency] and [view] only (file 16, section 11).",
+ "$defs": {
+  "boundary": {"enum": ["none", "confined", "sandbox", "vm"]},
+  "glob": {
+   "type": "string",
+   "maxLength": 1024,
+   "pattern": "^(?!(?:\\.[Ss][Ee][Cc][Rr][Ee][Tt][Ss]|[Tt][Mm][Pp]|\\.[Pp][Ss][Ww])(?:/|$))(?!(?:[Cc][Oo][Nn]|[Pp][Rr][Nn]|[Aa][Uu][Xx]|[Nn][Uu][Ll]|[Cc][Oo][Mm][0-9]|[Ll][Pp][Tt][0-9])(?:\\.|/|$))[^/\\x00-\\x1f\\x7f\\\\:\"<>|]{0,254}[^/\\x00-\\x1f\\x7f\\\\:\"<>|. ](?:/(?!(?:[Cc][Oo][Nn]|[Pp][Rr][Nn]|[Aa][Uu][Xx]|[Nn][Uu][Ll]|[Cc][Oo][Mm][0-9]|[Ll][Pp][Tt][0-9])(?:\\.|/|$))[^/\\x00-\\x1f\\x7f\\\\:\"<>|]{0,254}[^/\\x00-\\x1f\\x7f\\\\:\"<>|. ])*$",
+   "$comment": "The path rule of file 16, section 13, with * ? [ ] allowed: item 5 bars * and ? only outside a glob."
+  },
+  "label": {"type": "string", "pattern": "^[a-z0-9-]{1,32}$", "description": "A cell, region or juris label (file 08)."},
+  "shield": {"enum": ["none", "private", "guest", "sealed"]},
+  "defaults": {
+   "type": "object",
+   "additionalProperties": false,
+   "description": "Settings of scope run and shape (file 16, section 11; file 19); never a cell or a road.",
+   "properties": {
+    "tmpl": {"$ref": "https://podswarm.invalid/schemas/shape.1.schema.json#/properties/tmpl"},
+    "env": {"$ref": "https://podswarm.invalid/schemas/shape.1.schema.json#/properties/env"},
+    "inherit_env": {"$ref": "https://podswarm.invalid/schemas/shape.1.schema.json#/properties/inherit_env"},
+    "cwd": {"$ref": "https://podswarm.invalid/schemas/shape.1.schema.json#/properties/cwd"},
+    "io": {"$ref": "https://podswarm.invalid/schemas/shape.1.schema.json#/properties/io"},
+    "pty": {"$ref": "https://podswarm.invalid/schemas/shape.1.schema.json#/properties/pty"},
+    "merge": {"$ref": "https://podswarm.invalid/schemas/shape.1.schema.json#/properties/merge"},
+    "stdin": {"$ref": "https://podswarm.invalid/schemas/shape.1.schema.json#/properties/stdin"},
+    "shared_fs": {"$ref": "https://podswarm.invalid/schemas/shape.1.schema.json#/properties/shared_fs"},
+    "files": {"$ref": "https://podswarm.invalid/schemas/shape.1.schema.json#/properties/files"},
+    "outputs": {"$ref": "https://podswarm.invalid/schemas/shape.1.schema.json#/properties/outputs"},
+    "needs": {"$ref": "https://podswarm.invalid/schemas/shape.1.schema.json#/properties/needs"},
+    "limits": {"$ref": "https://podswarm.invalid/schemas/shape.1.schema.json#/properties/limits"},
+    "confine": {"$ref": "https://podswarm.invalid/schemas/shape.1.schema.json#/properties/confine"},
+    "shell_always": {"$ref": "https://podswarm.invalid/schemas/shape.1.schema.json#/properties/shell_always"},
+    "spread": {"$ref": "https://podswarm.invalid/schemas/shape.1.schema.json#/properties/spread"},
+    "checkpoint": {"$ref": "https://podswarm.invalid/schemas/shape.1.schema.json#/properties/checkpoint"},
+    "capture_blob": {"$ref": "https://podswarm.invalid/schemas/shape.1.schema.json#/properties/capture_blob"},
+    "timeout_s": {"$ref": "https://podswarm.invalid/schemas/shape.1.schema.json#/properties/timeout_s"},
+    "kill_grace_s": {"$ref": "https://podswarm.invalid/schemas/shape.1.schema.json#/properties/kill_grace_s"},
+    "silence_s": {"$ref": "https://podswarm.invalid/schemas/shape.1.schema.json#/properties/silence_s"},
+    "ok_codes": {"$ref": "https://podswarm.invalid/schemas/shape.1.schema.json#/properties/ok_codes"},
+    "capture_max": {"$ref": "https://podswarm.invalid/schemas/shape.1.schema.json#/properties/capture_max"},
+    "retries": {"$ref": "https://podswarm.invalid/schemas/shape.1.schema.json#/properties/retries"},
+    "retry_delay_s": {"$ref": "https://podswarm.invalid/schemas/shape.1.schema.json#/properties/retry_delay_s"},
+    "max_lost": {"$ref": "https://podswarm.invalid/schemas/shape.1.schema.json#/properties/max_lost"},
+    "delivery": {"$ref": "https://podswarm.invalid/schemas/shape.1.schema.json#/properties/delivery"},
+    "priority": {"$ref": "https://podswarm.invalid/schemas/shape.1.schema.json#/properties/priority"},
+    "no_retry_codes": {"$ref": "https://podswarm.invalid/schemas/shape.1.schema.json#/properties/no_retry_codes"},
+    "tags": {"$ref": "https://podswarm.invalid/schemas/shape.1.schema.json#/properties/tags"},
+    "net": {
+     "type": "string",
+     "pattern": "^(?:host|pool|home|none|exit:[A-Za-z0-9_-]{1,32})(?:;(?:require=(?:any|advisory|enforced)|strict=[01]|members=[A-Za-z0-9_-]{1,32}(?:\\+[A-Za-z0-9_-]{1,32})*|balance=(?:weighted|rr|minrtt|leastload|protect)|dns=(?:policy|host)|udp=(?:auto|off)|home=[0-9]{1,5}(?:,[0-9]{1,5}){0,15}))*$",
+     "not": {"pattern": "^(?:home|exit:)|;home="},
+     "description": "A workspace file cannot set home, home= or an exit: policy (file 14, section 1.1)."
+    },
+    "shield": {"$ref": "#/$defs/shield"},
+    "boundary": {"$ref": "#/$defs/boundary"},
+    "view": {"enum": ["auto", "fuse", "fuse-userns", "trap", "sync", "none"]}
+   },
+   "$comment": "shield, boundary and view are run settings. A shield or boundary below the user's is an error (not expressible here)."
+  },
+  "residency": {
+   "type": "object",
+   "additionalProperties": false,
+   "description": "A residency rule (file 08, section 8.4). An unknown key is a hard error.",
+   "properties": {
+    "allow_cell": {"type": "array", "items": {"$ref": "#/$defs/label"}},
+    "deny_cell": {"type": "array", "items": {"$ref": "#/$defs/label"}},
+    "allow_region": {"type": "array", "items": {"$ref": "#/$defs/label"}},
+    "allow_juris": {"type": "array", "items": {"$ref": "#/$defs/label"}},
+    "shield_min": {"$ref": "#/$defs/shield"},
+    "boundary_min": {"$ref": "#/$defs/boundary"}
+   }
+  },
+  "view": {
+   "type": "object",
+   "additionalProperties": false,
+   "properties": {
+    "pull": {"type": "array", "items": {"$ref": "#/$defs/glob"}},
+    "keep": {"type": "array", "items": {"$ref": "#/$defs/glob"}},
+    "protect": {"type": "array", "items": {"$ref": "#/$defs/glob"}},
+    "view_put_max_mib": {"type": "integer", "minimum": 1, "maximum": 65536},
+    "view_wb_max_mib": {"type": "integer", "minimum": 1, "maximum": 1048576},
+    "view_del_max": {"type": "integer", "minimum": 0, "maximum": 10000000},
+    "view_del_max_pct": {"type": "integer", "minimum": 0, "maximum": 100},
+    "view_ops_max": {"type": "integer", "minimum": 1, "maximum": 10000000}
+   },
+   "description": "Globs to add, and the five thresholds of file 06, section 10.5, which a workspace file can only lower (a higher value is ignored with a warning)."
+  }
+ }
+}

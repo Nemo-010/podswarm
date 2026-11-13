@@ -1,0 +1,11 @@
+{
+ "residency": {
+  "path": {
+   "~/w": {
+    "allow_host": [
+     "a"
+    ]
+   }
+  }
+ }
+}

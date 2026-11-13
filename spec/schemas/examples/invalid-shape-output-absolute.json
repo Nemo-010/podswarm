@@ -1,0 +1,10 @@
+{
+ "schema": 1,
+ "argv": [
+  "make",
+  "-j8"
+ ],
+ "outputs": [
+  "/etc/*"
+ ]
+}

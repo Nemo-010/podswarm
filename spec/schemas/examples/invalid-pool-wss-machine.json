@@ -1,0 +1,7 @@
+{
+ "host": {
+  "c": {
+   "road": "wss://coord.example"
+  }
+ }
+}

@@ -1,0 +1,25 @@
+{
+ "t": "event",
+ "sub": 4,
+ "ev": {
+  "schema": 1,
+  "kind": "event",
+  "seq": 4711,
+  "id": "01JC3Z8Y5R6T7V8W9X0Y1Z2A3B",
+  "type": "task.end",
+  "time_unix": 1794000123,
+  "cell": "home",
+  "run_id": 12,
+  "task_id": 345,
+  "attempt_no": 1,
+  "data": {
+   "outcome": "exited",
+   "code": 0,
+   "signal": null,
+   "reason": null,
+   "accepted": true,
+   "worker": 3,
+   "wall_ms": 8123
+  }
+ }
+}

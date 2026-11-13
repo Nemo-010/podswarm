@@ -1,0 +1,7 @@
+{
+ "schema": 1,
+ "name": "report",
+ "version": "0.1.0",
+ "summary": "prints a report",
+ "proto": 1
+}

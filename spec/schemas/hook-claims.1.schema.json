@@ -1,0 +1,25 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "$id": "https://podswarm.invalid/schemas/hook-claims.1.schema.json",
+ "title": "Webhook token claims",
+ "description": "The claims of the JWT in the Authorization header of a webhook delivery (header typ psw-hook+jwt, EdDSA). Home: file 17, section 5.",
+ "type": "object",
+ "required": ["iss", "aud", "iat", "nbf", "exp", "jti", "body_sha256", "event_id", "delivery"],
+ "properties": {
+  "iss": {"type": "string", "minLength": 1},
+  "aud": {"type": "string", "minLength": 1},
+  "iat": {"$ref": "#/$defs/unix"},
+  "nbf": {"$ref": "#/$defs/unix"},
+  "exp": {"$ref": "#/$defs/unix"},
+  "jti": {
+   "type": "string",
+   "pattern": "^[A-Za-z0-9_-]{22}$",
+   "description": "base64url without padding of 16 random bytes."
+  },
+  "body_sha256": {"type": "string", "pattern": "^[A-Za-z0-9_-]{43}$"},
+  "event_id": {"type": "string", "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"},
+  "delivery": {"type": "string", "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$", "description": "A ULID."}
+ },
+ "$comment": "exp = iat + 300 is not expressible here.",
+ "$defs": {"unix": {"type": "integer", "minimum": 0, "description": "Unix seconds, wall clock."}}
+}

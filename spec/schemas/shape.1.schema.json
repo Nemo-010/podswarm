@@ -1,0 +1,238 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "$id": "https://podswarm.invalid/schemas/shape.1.schema.json",
+ "title": "Shape",
+ "description": "A shape: what many tasks share. Home: file 05, section 1. Queue fields: file 09, section 3.1. Needs: file 05 section 2 and file 09 section 4. Files and checkpoint: file 15.",
+ "type": "object",
+ "required": ["schema"],
+ "additionalProperties": false,
+ "properties": {
+  "schema": {"const": 1},
+  "tmpl": {"enum": [0, 1], "default": 1},
+  "argv": {"type": "array", "items": {"type": "string"}},
+  "shell": {"type": "string"},
+  "env": {"type": "object", "additionalProperties": {"type": "string"}},
+  "inherit_env": {"type": "boolean"},
+  "cwd": {"type": "string"},
+  "io": {"enum": ["capture", "attached"], "default": "capture"},
+  "pty": {"type": "boolean", "default": false},
+  "merge": {"type": "boolean", "default": false},
+  "stdin": {
+   "oneOf": [
+    {"type": "null"},
+    {"type": "object", "additionalProperties": false, "required": ["inline"], "properties": {"inline": {"type": "string"}}},
+    {"type": "object", "additionalProperties": false, "required": ["blob"], "properties": {"blob": {"$ref": "#/$defs/b3"}}}
+   ]
+  },
+  "view": {
+   "oneOf": [
+    {"type": "null"},
+    {
+     "type": "object",
+     "additionalProperties": false,
+     "description": "The view of the attempt (file 06, section 1). ws, root and mode are required; cwd defaults to the root, with to empty.",
+     "required": ["ws", "root", "mode"],
+     "properties": {
+      "ws": {"$ref": "#/$defs/b3"},
+      "root": {"type": "string", "pattern": "^/"},
+      "cwd": {"type": "string"},
+      "mode": {"enum": ["auto", "fuse", "fuse-userns", "trap", "sync", "none"]},
+      "with": {"type": "array", "items": {"type": "string"}}
+     }
+    }
+   ]
+  },
+  "shared_fs": {"type": "boolean", "default": false},
+  "files": {"type": "array", "items": {"$ref": "#/$defs/file_entry"}},
+  "outputs": {"type": "array", "items": {"$ref": "#/$defs/glob"}},
+  "needs": {"$ref": "#/$defs/needs"},
+  "limits": {
+   "type": "object",
+   "additionalProperties": false,
+   "description": "Limits of file 12, section 7.",
+   "properties": {
+    "cpu_s": {"type": "integer", "minimum": 1},
+    "mem_mib": {"type": "integer", "minimum": 1},
+    "as_mib": {"type": "integer", "minimum": 1},
+    "fsize_mib": {"type": "integer", "minimum": 1},
+    "nofile": {"type": "integer", "minimum": 16},
+    "pids": {"type": "integer", "minimum": 1},
+    "core": {
+     "type": "boolean",
+     "default": false,
+     "description": "true lets the payload write a core file (file 05, section 1)."
+    }
+   }
+  },
+  "confine": {
+   "type": "object",
+   "additionalProperties": false,
+   "description": "Grants of confined (file 12, section 17.4).",
+   "properties": {
+    "read": {"type": "array", "maxItems": 64, "items": {"type": "string", "maxLength": 1024}},
+    "write": {"type": "array", "maxItems": 64, "items": {"type": "string", "maxLength": 1024}},
+    "exec": {"type": "array", "maxItems": 64, "items": {"type": "string", "maxLength": 1024}},
+    "connect": {"type": "array", "items": {"type": "integer", "minimum": 0, "maximum": 65535}},
+    "bind": {"type": "array", "items": {"type": "integer", "minimum": 0, "maximum": 65535}},
+    "udp": {"type": "boolean", "default": true},
+    "unix": {"type": "boolean", "default": false}
+   }
+  },
+  "shell_always": {"type": "boolean", "default": false},
+  "net": {
+   "type": "string",
+   "pattern": "^(?:host|pool|home|none|exit:[A-Za-z0-9_-]{1,32})(?:;(?:require=(?:any|advisory|enforced)|strict=[01]|members=[A-Za-z0-9_-]{1,32}(?:\\+[A-Za-z0-9_-]{1,32})*|balance=(?:weighted|rr|minrtt|leastload|protect)|dns=(?:policy|host)|udp=(?:auto|off)|home=[0-9]{1,5}(?:,[0-9]{1,5}){0,15}))*$",
+   "default": "pool",
+   "description": "The policy string of file 14, section 1.1."
+  },
+  "spread": {"type": "boolean", "default": false},
+  "checkpoint": {"$ref": "#/$defs/checkpoint"},
+  "capture_blob": {"type": "boolean", "default": false},
+  "timeout_s": {"type": ["integer", "null"], "minimum": 1},
+  "kill_grace_s": {"type": "integer", "minimum": 0, "maximum": 600, "default": 10},
+  "silence_s": {"type": "integer", "minimum": 30, "maximum": 86400, "default": 30},
+  "ok_codes": {"type": "array", "items": {"type": "integer", "minimum": 0, "maximum": 255}, "default": [0]},
+  "capture_max": {"type": "integer", "minimum": 0, "maximum": 65536, "default": 16384},
+  "retries": {"type": "integer", "minimum": 0, "maximum": 1000, "default": 0},
+  "retry_delay_s": {"type": "integer", "minimum": 0, "maximum": 3600, "default": 2},
+  "max_lost": {"type": "integer", "minimum": 0, "maximum": 1000, "default": 5},
+  "delivery": {"enum": ["at_least_once", "at_most_once"], "default": "at_least_once"},
+  "priority": {"type": "integer", "minimum": -100, "maximum": 100},
+  "no_retry_codes": {"type": "array", "items": {"type": "integer", "minimum": 0, "maximum": 255}},
+  "tags": {"$ref": "#/$defs/tags_map"},
+  "secrets": {"$comment": "Reserved (file 24): refused with unsupported until its feature is on.", "not": {}},
+  "sig": {"$comment": "Reserved (file 24): refused with unsupported until its feature is on.", "not": {}},
+  "verify": {"$comment": "Reserved (file 24): refused with unsupported until its feature is on.", "not": {}},
+  "speculate": {"$comment": "Reserved (file 24): refused with unsupported until its feature is on.", "not": {}},
+  "image": {"$comment": "Reserved (file 24): refused with unsupported until its feature is on.", "not": {}},
+  "after": {"$comment": "Reserved (file 24): refused with unsupported until its feature is on.", "not": {}}
+ },
+ "oneOf": [{"required": ["argv"], "not": {"required": ["shell"]}}, {"required": ["shell"], "not": {"required": ["argv"]}}],
+ "allOf": [
+  {
+   "if": {"required": ["delivery"], "properties": {"delivery": {"const": "at_most_once"}}},
+   "then": {"properties": {"retries": {"const": 0}}},
+   "$comment": "File 09 section 3.1: at_most_once with retries above 0 is bad_request."
+  }
+ ],
+ "$comment": "Not expressible here: the size of 65,536 bytes, the duplicate key, schema as the first field, a code in both ok_codes and no_retry_codes (bad_request), silence_s below 2 * (hb_s + rtt_max).",
+ "$defs": {
+  "b3": {"type": "string", "pattern": "^b3:[0-9a-f]{64}$", "description": "A content id: BLAKE3 (file 15)."},
+  "boundary": {"enum": ["none", "confined", "sandbox", "vm"]},
+  "glob": {
+   "type": "string",
+   "maxLength": 1024,
+   "pattern": "^(?!(?:\\.[Ss][Ee][Cc][Rr][Ee][Tt][Ss]|[Tt][Mm][Pp]|\\.[Pp][Ss][Ww])(?:/|$))(?!(?:[Cc][Oo][Nn]|[Pp][Rr][Nn]|[Aa][Uu][Xx]|[Nn][Uu][Ll]|[Cc][Oo][Mm][0-9]|[Ll][Pp][Tt][0-9])(?:\\.|/|$))[^/\\x00-\\x1f\\x7f\\\\:\"<>|]{0,254}[^/\\x00-\\x1f\\x7f\\\\:\"<>|. ](?:/(?!(?:[Cc][Oo][Nn]|[Pp][Rr][Nn]|[Aa][Uu][Xx]|[Nn][Uu][Ll]|[Cc][Oo][Mm][0-9]|[Ll][Pp][Tt][0-9])(?:\\.|/|$))[^/\\x00-\\x1f\\x7f\\\\:\"<>|]{0,254}[^/\\x00-\\x1f\\x7f\\\\:\"<>|. ])*$",
+   "description": "An outputs glob: the path rule of file 16, section 13, with * and ? allowed (item 5)."
+  },
+  "relpath": {
+   "type": "string",
+   "maxLength": 1024,
+   "pattern": "^(?!(?:\\.[Ss][Ee][Cc][Rr][Ee][Tt][Ss]|[Tt][Mm][Pp]|\\.[Pp][Ss][Ww])(?:/|$))(?!(?:[Cc][Oo][Nn]|[Pp][Rr][Nn]|[Aa][Uu][Xx]|[Nn][Uu][Ll]|[Cc][Oo][Mm][0-9]|[Ll][Pp][Tt][0-9])(?:\\.|/|$))[^/\\x00-\\x1f\\x7f\\\\:*?\"<>|]{0,254}[^/\\x00-\\x1f\\x7f\\\\:*?\"<>|. ](?:/(?!(?:[Cc][Oo][Nn]|[Pp][Rr][Nn]|[Aa][Uu][Xx]|[Nn][Uu][Ll]|[Cc][Oo][Mm][0-9]|[Ll][Pp][Tt][0-9])(?:\\.|/|$))[^/\\x00-\\x1f\\x7f\\\\:*?\"<>|]{0,254}[^/\\x00-\\x1f\\x7f\\\\:*?\"<>|. ])*$",
+   "description": "The path rule of file 16, section 13 (items 1 to 8; item 9 spans paths)."
+  },
+  "shield": {"enum": ["none", "private", "guest", "sealed"]},
+  "sig_name": {"enum": ["INT", "TERM", "HUP", "QUIT", "USR1", "USR2", "TSTP", "CONT", "WINCH"]},
+  "tag": {"type": "string", "pattern": "^[A-Za-z0-9_.+-]{1,120}$"},
+  "tags_map": {
+   "type": "object",
+   "propertyNames": {"$ref": "#/$defs/tag"},
+   "additionalProperties": {"type": "string", "pattern": "^[A-Za-z0-9_.+-]{0,120}$"},
+   "description": "Tag name to value (file 09, section 3.3). A tag with no value has the empty string as its value."
+  },
+  "u32": {"type": "integer", "minimum": 0, "maximum": 4294967295},
+  "u64": {"type": "integer", "minimum": 0, "maximum": 18446744073709551615},
+  "needs": {
+   "type": "object",
+   "additionalProperties": false,
+   "description": "What the task requires from a worker (file 05 section 2, file 09 section 4).",
+   "properties": {
+    "cores_m": {"$ref": "#/$defs/u32", "default": 1000},
+    "mem_mib": {"$ref": "#/$defs/u32", "default": 0},
+    "disk_mib": {"$ref": "#/$defs/u32", "default": 0},
+    "res": {
+     "type": "object",
+     "maxProperties": 16,
+     "propertyNames": {"type": "string", "pattern": "^(?!(?:cores|mem|disk|time)$)[a-z][a-z0-9_]{0,31}$"},
+     "additionalProperties": {"type": "integer", "minimum": 1, "maximum": 1000000},
+     "description": "Named resources: a name follows file 08, section 5; at most 16 names; counts 1 to 1,000,000."
+    },
+    "tags_all": {"type": "array", "items": {"type": "string"}},
+    "tags_any": {"type": "array", "items": {"type": "string"}},
+    "os": {"type": "array", "items": {"type": "string"}},
+    "arch": {
+     "type": "array",
+     "items": {"enum": ["x86_64", "aarch64", "armv7", "arm", "i686", "riscv64", "loongarch64", "s390x", "powerpc64le"]},
+     "description": "The values of caps.arch (file 08, section 2.1)."
+    },
+    "shell": {"type": "string"},
+    "interp": {"type": "string"},
+    "boundary": {"$ref": "#/$defs/boundary", "default": "none"},
+    "shield": {"$ref": "#/$defs/shield"},
+    "exclusive": {"type": "boolean", "default": false},
+    "limits_required": {"type": "array", "items": {"enum": ["cpu_s", "mem_mib", "as_mib", "fsize_mib", "nofile", "pids", "core"]}},
+    "worker": {"$ref": "#/$defs/u32", "description": "Set only by podswarm each."},
+    "time_s": {"$ref": "#/$defs/u32"}
+   }
+  },
+  "file_entry": {
+   "oneOf": [
+    {
+     "type": "object",
+     "additionalProperties": false,
+     "required": ["id", "path"],
+     "properties": {
+      "id": {"$ref": "#/$defs/b3"},
+      "path": {"$ref": "#/$defs/relpath"},
+      "mode": {"type": "string", "pattern": "^0?[0-7][0-7][0145][0145]$"},
+      "unpack": {"enum": ["tar", "tar.gz", "tar.zst"]}
+     }
+    },
+    {
+     "type": "object",
+     "additionalProperties": false,
+     "required": ["tree", "path"],
+     "properties": {"tree": {"$ref": "#/$defs/b3"}, "path": {"$ref": "#/$defs/relpath"}}
+    },
+    {
+     "type": "object",
+     "additionalProperties": false,
+     "required": ["url", "sha256", "size", "path"],
+     "properties": {
+      "url": {"type": "string", "pattern": "^https://"},
+      "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+      "size": {"$ref": "#/$defs/u64"},
+      "path": {"$ref": "#/$defs/relpath"},
+      "unpack": {"enum": ["tar", "tar.gz", "tar.zst"]}
+     },
+     "description": "A URL input (file 15, section 3.5): the url is https."
+    }
+   ],
+   "description": "A staged input (file 15, section 3)."
+  },
+  "checkpoint": {
+   "oneOf": [
+    {"type": "null"},
+    {
+     "type": "object",
+     "additionalProperties": false,
+     "description": "Checkpoint and resume (file 15, section 11.2).",
+     "properties": {
+      "exit_code": {"type": "integer", "minimum": 1, "maximum": 255},
+      "signal": {"$ref": "#/$defs/sig_name", "default": "USR1"},
+      "grace_s": {"type": "integer", "minimum": 1, "maximum": 600, "default": 30},
+      "every_s": {"type": ["integer", "null"], "minimum": 60, "maximum": 604800},
+      "retain": {"type": "integer", "minimum": 1, "maximum": 100, "default": 2},
+      "max_mib": {"type": "integer", "minimum": 1, "default": 1024},
+      "encrypt": {"enum": ["run", null]},
+      "sink": {"type": "string", "pattern": "^[a-z0-9-]{1,32}$"},
+      "mode": {"enum": ["explicit", "dir_at_end"], "default": "explicit"},
+      "partial_ok": {"type": "boolean", "default": false}
+     },
+     "not": {"required": ["encrypt", "sink"], "properties": {"encrypt": {"const": "run"}}},
+     "$comment": "Off of every_s and encrypt is absent or null. encrypt and sink exclude each other. Not expressible here: max_mib above max_ckpt_mib, exit_code in ok_codes (bad_request)."
+    }
+   ]
+  }
+ }
+}

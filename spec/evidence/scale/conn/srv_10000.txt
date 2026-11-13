@@ -1,0 +1,9 @@
+SERVER conns=0 rss_mib=4.5 fds=11 cpu_cores_last=0.000 msgs_per_s=0
+SERVER conns=7564 rss_mib=149.1 fds=7575 cpu_cores_last=1.155 msgs_per_s=150
+SERVER conns=10000 rss_mib=194.3 fds=10011 cpu_cores_last=0.417 msgs_per_s=963
+SERVER conns=10000 rss_mib=194.3 fds=10011 cpu_cores_last=0.062 msgs_per_s=996
+SERVER conns=10000 rss_mib=194.3 fds=10011 cpu_cores_last=0.062 msgs_per_s=999
+SERVER conns=10000 rss_mib=194.4 fds=10011 cpu_cores_last=0.059 msgs_per_s=994
+SERVER conns=10000 rss_mib=194.5 fds=10011 cpu_cores_last=0.058 msgs_per_s=1004
+SERVER conns=10000 rss_mib=194.5 fds=10011 cpu_cores_last=0.064 msgs_per_s=1005
+SERVER conns=10000 rss_mib=194.5 fds=10011 cpu_cores_last=0.061 msgs_per_s=998

@@ -1,0 +1,9 @@
+{
+ "t": "err",
+ "code": "oops",
+ "text": "max_queued reached",
+ "fatal": false,
+ "limit": 64,
+ "used": 64,
+ "scope": "submitter"
+}

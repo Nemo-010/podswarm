@@ -1,0 +1,19 @@
+{
+ "iss": "key:SHA256:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+ "sub": "podswarm:eu1:run:12:task:345",
+ "aud": "https://vault.example",
+ "iat": 1794000000,
+ "nbf": 1794000000,
+ "exp": 1794000600,
+ "jti": "CCCCCCCCCCCCCCCCCCCCCC",
+ "run_id": 12,
+ "task_id": 345,
+ "attempt_no": 1,
+ "worker": 3,
+ "boundary": "confined",
+ "shield": "private",
+ "shape": "1a2b3c4d5e6f7a8b",
+ "sub_key": "SHA256:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+ "ws": "repo-a",
+ "ref": "main"
+}

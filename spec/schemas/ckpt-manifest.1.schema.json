@@ -1,0 +1,32 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "$id": "https://podswarm.invalid/schemas/ckpt-manifest.1.schema.json",
+ "title": "Tree manifest",
+ "description": "A tree manifest (a directory input, a checkpoint, a view directory), as the JSON array of its lines without the newlines. Home: file 15, section 1.1. Path rule: file 16, section 13.",
+ "type": "array",
+ "minItems": 1,
+ "prefixItems": [{"type": "string", "pattern": "^podswarm-tree/1(?: enc=b3k)?$"}],
+ "items": {
+  "type": "string",
+  "anyOf": [
+   {
+    "pattern": "^F 0[0-7][0145][0145] [0-9]+ [0-9a-f]{64} (?!(?:\\.[Ss][Ee][Cc][Rr][Ee][Tt][Ss]|[Tt][Mm][Pp]|\\.[Pp][Ss][Ww])(?:/|$))(?!(?:[Cc][Oo][Nn]|[Pp][Rr][Nn]|[Aa][Uu][Xx]|[Nn][Uu][Ll]|[Cc][Oo][Mm][0-9]|[Ll][Pp][Tt][0-9])(?:\\.|/|$))[^/\\x00-\\x1f\\x7f\\\\:*?\"<>|]{0,254}[^/\\x00-\\x1f\\x7f\\\\:*?\"<>|. ](?:/(?!(?:[Cc][Oo][Nn]|[Pp][Rr][Nn]|[Aa][Uu][Xx]|[Nn][Uu][Ll]|[Cc][Oo][Mm][0-9]|[Ll][Pp][Tt][0-9])(?:\\.|/|$))[^/\\x00-\\x1f\\x7f\\\\:*?\"<>|]{0,254}[^/\\x00-\\x1f\\x7f\\\\:*?\"<>|. ])*$",
+    "description": "F"
+   },
+   {
+    "pattern": "^D 0[0-7][0145][0145] (?!(?:\\.[Ss][Ee][Cc][Rr][Ee][Tt][Ss]|[Tt][Mm][Pp]|\\.[Pp][Ss][Ww])(?:/|$))(?!(?:[Cc][Oo][Nn]|[Pp][Rr][Nn]|[Aa][Uu][Xx]|[Nn][Uu][Ll]|[Cc][Oo][Mm][0-9]|[Ll][Pp][Tt][0-9])(?:\\.|/|$))[^/\\x00-\\x1f\\x7f\\\\:*?\"<>|]{0,254}[^/\\x00-\\x1f\\x7f\\\\:*?\"<>|. ](?:/(?!(?:[Cc][Oo][Nn]|[Pp][Rr][Nn]|[Aa][Uu][Xx]|[Nn][Uu][Ll]|[Cc][Oo][Mm][0-9]|[Ll][Pp][Tt][0-9])(?:\\.|/|$))[^/\\x00-\\x1f\\x7f\\\\:*?\"<>|]{0,254}[^/\\x00-\\x1f\\x7f\\\\:*?\"<>|. ])*$",
+    "description": "D"
+   },
+   {
+    "pattern": "^L [^ \\n]+ (?!(?:\\.[Ss][Ee][Cc][Rr][Ee][Tt][Ss]|[Tt][Mm][Pp]|\\.[Pp][Ss][Ww])(?:/|$))(?!(?:[Cc][Oo][Nn]|[Pp][Rr][Nn]|[Aa][Uu][Xx]|[Nn][Uu][Ll]|[Cc][Oo][Mm][0-9]|[Ll][Pp][Tt][0-9])(?:\\.|/|$))[^/\\x00-\\x1f\\x7f\\\\:*?\"<>|]{0,254}[^/\\x00-\\x1f\\x7f\\\\:*?\"<>|. ](?:/(?!(?:[Cc][Oo][Nn]|[Pp][Rr][Nn]|[Aa][Uu][Xx]|[Nn][Uu][Ll]|[Cc][Oo][Mm][0-9]|[Ll][Pp][Tt][0-9])(?:\\.|/|$))[^/\\x00-\\x1f\\x7f\\\\:*?\"<>|]{0,254}[^/\\x00-\\x1f\\x7f\\\\:*?\"<>|. ])*$",
+    "description": "L"
+   },
+   {
+    "pattern": "^C 0[0-7][0145][0145] [0-9]+ [0-9]+ (?!(?:\\.[Ss][Ee][Cc][Rr][Ee][Tt][Ss]|[Tt][Mm][Pp]|\\.[Pp][Ss][Ww])(?:/|$))(?!(?:[Cc][Oo][Nn]|[Pp][Rr][Nn]|[Aa][Uu][Xx]|[Nn][Uu][Ll]|[Cc][Oo][Mm][0-9]|[Ll][Pp][Tt][0-9])(?:\\.|/|$))[^/\\x00-\\x1f\\x7f\\\\:*?\"<>|]{0,254}[^/\\x00-\\x1f\\x7f\\\\:*?\"<>|. ](?:/(?!(?:[Cc][Oo][Nn]|[Pp][Rr][Nn]|[Aa][Uu][Xx]|[Nn][Uu][Ll]|[Cc][Oo][Mm][0-9]|[Ll][Pp][Tt][0-9])(?:\\.|/|$))[^/\\x00-\\x1f\\x7f\\\\:*?\"<>|]{0,254}[^/\\x00-\\x1f\\x7f\\\\:*?\"<>|. ])*$",
+    "description": "C"
+   },
+   {"pattern": "^H [0-9a-f]{64}$", "description": "H"}
+  ]
+ },
+ "$comment": "Not expressible here: the cap of 100,000 F, D, L and C lines (H lines do not count, so no maxItems), the 8 MiB cap, the sort by path bytes, one H line per chunk after C. An L target holds no space and no newline (file 15, section 1.1)."
+}

@@ -1,0 +1,18 @@
+RESULT workers=10 bundle=1 dur=strict tail=true lease_wait=true ckpt=auto tasks=7620 wall=10.00s tasks_per_s=762 mean_bundle=1.0
+  commits=1524 commits_per_s=152 events_per_commit=10.0 commit_ms p50=3.85 p99=8.49 max=456.72
+  VERIFY (python, outside): tasks state=5: 7620 results: 7620 attempts ended: 7620 dup accepted: 0 state3 left: 0
+RESULT workers=10 bundle=1 dur=strict tail=true lease_wait=true ckpt=auto tasks=1490 wall=10.05s tasks_per_s=148 mean_bundle=1.0
+  commits=2980 commits_per_s=297 events_per_commit=1.0 commit_ms p50=3.33 p99=6.70 max=410.60
+  VERIFY (python, outside): tasks state=5: 1490 results: 1490 attempts ended: 1490 dup accepted: 0 state3 left: 0
+RESULT workers=200 bundle=1 dur=strict tail=true lease_wait=true ckpt=auto tasks=99991 wall=10.02s tasks_per_s=9981 mean_bundle=1.0
+  commits=1001 commits_per_s=100 events_per_commit=199.8 commit_ms p50=6.51 p99=17.52 max=520.26
+  VERIFY (python, outside): tasks state=5: 99991 results: 99991 attempts ended: 99991 dup accepted: 0 state3 left: 0
+RESULT workers=200 bundle=1 dur=strict tail=true lease_wait=true ckpt=auto tasks=1587 wall=11.37s tasks_per_s=140 mean_bundle=1.0
+  commits=3174 commits_per_s=279 events_per_commit=1.0 commit_ms p50=3.51 p99=7.67 max=420.08
+  VERIFY (python, outside): tasks state=5: 1587 results: 1587 attempts ended: 1587 dup accepted: 0 state3 left: 0
+RESULT workers=200 bundle=1 dur=batched tail=true lease_wait=true ckpt=auto tasks=17800 wall=10.11s tasks_per_s=1761 mean_bundle=1.0
+  commits=178 commits_per_s=18 events_per_commit=200.0 commit_ms p50=2.52 p99=32.70 max=438.53
+  VERIFY (python, outside): tasks state=5: 17800 results: 17800 attempts ended: 17800 dup accepted: 0 state3 left: 0
+RESULT workers=200 bundle=10 dur=batched tail=true lease_wait=true ckpt=auto tasks=132000 wall=10.05s tasks_per_s=13140 mean_bundle=10.0
+  commits=132 commits_per_s=13 events_per_commit=200.0 commit_ms p50=17.11 p99=48.38 max=437.62
+  VERIFY (python, outside): tasks state=5: 132000 results: 132000 attempts ended: 132000 dup accepted: 0 state3 left: 0

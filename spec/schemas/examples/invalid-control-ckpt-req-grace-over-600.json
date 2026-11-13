@@ -1,0 +1,12 @@
+{
+ "t": "ckpt_req",
+ "items": [
+  [
+   41,
+   1
+  ]
+ ],
+ "cause": "drain",
+ "grace_s": 601,
+ "stop": true
+}

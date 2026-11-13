@@ -1,0 +1,22 @@
+{
+ "t": "hb",
+ "seq": 120,
+ "seen": 8,
+ "hold": [
+  [
+   41,
+   1,
+   "x"
+  ]
+ ],
+ "load": {
+  "busy_m": 2500,
+  "own_m": 2000,
+  "mem_avail_mib": 6000,
+  "disk_free_mib": 18000
+ },
+ "blobs": [
+  "b3:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+ ],
+ "lifetime_s": 3600
+}

@@ -1,0 +1,65 @@
+{
+ "defaults": {
+  "local_under_ms": 150
+ },
+ "host": {
+  "bigbox": {
+   "road": "ssh://dev@bigbox.example",
+   "trust": "shared",
+   "tags": [
+    "fast"
+   ],
+   "cell": "eu"
+  },
+  "lab1": {
+   "road": "lab1",
+   "trust": "own",
+   "res": {
+    "gpu": 2
+   },
+   "uplink": true
+  },
+  "pi4": {
+   "road": "ssh://pi@pi4.example",
+   "slots": 3,
+   "time_limit": "8h"
+  },
+  "local": {
+   "slots": 4
+  }
+ },
+ "group": {
+  "build": {
+   "members": [
+    "bigbox",
+    "lab1",
+    "tag:gpu"
+   ]
+  }
+ },
+ "cell": {
+  "eu": {
+   "region": "eu-central",
+   "juris": "eu"
+  },
+  "swarm1": {
+   "road": "wss://coord.example:443"
+  }
+ },
+ "exit": {
+  "office": {
+   "via": "host:lab1",
+   "trust": "own"
+  }
+ },
+ "residency": {
+  "path": {
+   "~/work/client-a": {
+    "allow_juris": [
+     "eu"
+    ],
+    "shield_min": "private"
+   }
+  }
+ }
+}

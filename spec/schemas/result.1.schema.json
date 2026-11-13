@@ -1,0 +1,199 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "$id": "https://podswarm.invalid/schemas/result.1.schema.json",
+ "title": "CLI result document",
+ "description": "A document that a verb prints with --json: run.result, error, rows, dry_run. Home: file 17, section 1. Outcomes and reasons: file 05, section 3; codes: file 05, section 11; exit codes: file 19, section 5.",
+ "type": "object",
+ "required": ["schema", "kind"],
+ "oneOf": [
+  {
+   "type": "object",
+   "description": "The result document of podswarm run --json.",
+   "required": [
+    "schema",
+    "kind",
+    "run_id",
+    "task_id",
+    "attempt_no",
+    "ok",
+    "outcome",
+    "code",
+    "signal",
+    "reason",
+    "worker",
+    "where",
+    "wall_ms",
+    "user_ms",
+    "sys_ms",
+    "rss_kib",
+    "started_unix",
+    "ended_unix",
+    "stdout",
+    "stderr"
+   ],
+   "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "run.result"},
+    "run_id": {"$ref": "#/$defs/u64"},
+    "task_id": {"$ref": "#/$defs/u64"},
+    "attempt_no": {"type": "integer", "minimum": 1, "maximum": 4294967295},
+    "ok": {"type": "boolean"},
+    "outcome": {"$ref": "#/$defs/outcome"},
+    "code": {"type": ["integer", "null"], "minimum": 0, "maximum": 255},
+    "signal": {"type": ["integer", "null"], "minimum": 1, "maximum": 127},
+    "reason": {"type": ["string", "null"]},
+    "worker": {
+     "type": "object",
+     "required": ["wid", "name", "cell", "boundary", "shield"],
+     "properties": {
+      "wid": {"$ref": "#/$defs/u32"},
+      "name": {"type": "string"},
+      "cell": {"$ref": "#/$defs/label"},
+      "boundary": {"$ref": "#/$defs/boundary"},
+      "shield": {"$ref": "#/$defs/shield"},
+      "juris": {"oneOf": [{"$ref": "#/$defs/label"}, {"type": "null"}]}
+     }
+    },
+    "where": {
+     "type": "object",
+     "required": ["road", "view", "net"],
+     "properties": {
+      "road": {"enum": ["ssh", "local", "exec", "podssh", "wss", "relay"]},
+      "view": {"enum": ["fuse", "fuse-userns", "trap", "sync", "none"]},
+      "net": {"type": "string"}
+     },
+     "description": "road: a road name of file 04; view: a rung of file 06 or none (file 17, section 1)."
+    },
+    "wall_ms": {"$ref": "#/$defs/u64"},
+    "user_ms": {"$ref": "#/$defs/u64"},
+    "sys_ms": {"$ref": "#/$defs/u64"},
+    "rss_kib": {"$ref": "#/$defs/u64"},
+    "in_bytes": {"$ref": "#/$defs/u64"},
+    "out_bytes": {"$ref": "#/$defs/u64"},
+    "net_bytes": {"type": ["integer", "null"], "minimum": 0},
+    "started_unix": {"$ref": "#/$defs/unix"},
+    "ended_unix": {"$ref": "#/$defs/unix"},
+    "stdout": {"$ref": "#/$defs/stream_part"},
+    "stderr": {"$ref": "#/$defs/stream_part"}
+   },
+   "allOf": [
+    {"if": {"properties": {"outcome": {"const": "exited"}}}, "then": {"properties": {"code": {"type": "integer"}}}},
+    {"if": {"properties": {"ok": {"const": true}}}, "then": {"properties": {"outcome": {"const": "exited"}}}}
+   ]
+  },
+  {
+   "type": "object",
+   "required": ["schema", "kind", "error"],
+   "description": "The error document of a failure with --json.",
+   "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "error"},
+    "error": {
+     "type": "object",
+     "required": ["code", "text", "exit", "retry"],
+     "properties": {
+      "code": {"$ref": "#/$defs/err_code"},
+      "text": {"type": "string"},
+      "exit": {"type": "integer", "minimum": 0, "maximum": 255},
+      "retry": {"enum": ["no", "fix", "backoff", "wait"]},
+      "scope": {"enum": ["submitter", "swarm"]},
+      "limit": {"type": "integer", "minimum": 0},
+      "used": {"type": "integer", "minimum": 0},
+      "reason": {"type": "string"},
+      "retry_after_ms": {"$ref": "#/$defs/u64"}
+     },
+     "allOf": [
+      {"if": {"properties": {"code": {"const": "bad_request"}}}, "then": {"properties": {"exit": {"const": 64}}}},
+      {"if": {"properties": {"code": {"const": "bad_state"}}}, "then": {"properties": {"exit": {"const": 64}}}},
+      {"if": {"properties": {"code": {"const": "wrong_cell"}}}, "then": {"properties": {"exit": {"const": 64}}}},
+      {"if": {"properties": {"code": {"const": "not_found"}}}, "then": {"properties": {"exit": {"const": 66}}}},
+      {"if": {"properties": {"code": {"const": "internal"}}}, "then": {"properties": {"exit": {"const": 70}}}},
+      {"if": {"properties": {"code": {"const": "busy"}}}, "then": {"properties": {"exit": {"const": 75}}}},
+      {"if": {"properties": {"code": {"const": "attempt_live"}}}, "then": {"properties": {"exit": {"const": 75}}}},
+      {"if": {"properties": {"code": {"const": "too_large"}}}, "then": {"properties": {"exit": {"const": 76}}}},
+      {"if": {"properties": {"code": {"const": "unauthorized"}}}, "then": {"properties": {"exit": {"const": 77}}}},
+      {"if": {"properties": {"code": {"const": "duplicate_identity"}}}, "then": {"properties": {"exit": {"const": 77}}}},
+      {"if": {"properties": {"code": {"const": "quota"}}}, "then": {"properties": {"exit": {"const": 77}}}},
+      {"if": {"properties": {"code": {"const": "revoked"}}}, "then": {"properties": {"exit": {"const": 78}}}},
+      {"if": {"properties": {"code": {"const": "policy"}}}, "then": {"properties": {"exit": {"const": 79}}}},
+      {"if": {"properties": {"code": {"const": "needs_unsatisfiable"}}}, "then": {"properties": {"exit": {"const": 79}}}},
+      {"if": {"properties": {"code": {"const": "shield_unavailable"}}}, "then": {"properties": {"exit": {"const": 79}}}},
+      {"if": {"properties": {"code": {"const": "no_cell"}}}, "then": {"properties": {"exit": {"const": 79}}}},
+      {"if": {"properties": {"code": {"const": "unsupported"}}}, "then": {"properties": {"exit": {"const": 80}}}},
+      {"if": {"properties": {"retry": {"const": "wait"}}}, "then": {"required": ["retry_after_ms"]}}
+     ],
+     "$comment": "exit follows the class of each code (file 05 section 11, file 19 section 5)."
+    }
+   }
+  },
+  {
+   "type": "object",
+   "required": ["schema", "kind", "rows", "next"],
+   "description": "A list with --json.",
+   "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "rows"},
+    "rows": {"type": "array"},
+    "next": {"type": ["string", "null"], "description": "An opaque cursor, null at the end."}
+   }
+  },
+  {
+   "type": "object",
+   "required": ["schema", "kind", "actions"],
+   "description": "The document of --dry-run.",
+   "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "dry_run"},
+    "actions": {
+     "type": "array",
+     "items": {"type": "object", "required": ["op", "target", "detail"], "properties": {"op": {"type": "string"}, "target": {}, "detail": {}}}
+    }
+   }
+  }
+ ],
+ "$comment": "DIR/<index>/status.json of --results is the run.result document of its task (file 15, section 7).",
+ "$defs": {
+  "b3": {"type": "string", "pattern": "^b3:[0-9a-f]{64}$", "description": "A content id: BLAKE3 (file 15)."},
+  "boundary": {"enum": ["none", "confined", "sandbox", "vm"]},
+  "err_code": {
+   "enum": [
+    "bad_request",
+    "bad_state",
+    "attempt_live",
+    "unauthorized",
+    "revoked",
+    "duplicate_identity",
+    "unsupported",
+    "busy",
+    "too_large",
+    "policy",
+    "needs_unsatisfiable",
+    "shield_unavailable",
+    "no_cell",
+    "wrong_cell",
+    "quota",
+    "not_found",
+    "internal"
+   ]
+  },
+  "label": {"type": "string", "pattern": "^[a-z0-9-]{1,32}$", "description": "A cell, region or juris label (file 08)."},
+  "outcome": {"enum": ["exited", "signaled", "timeout", "spawn_failed", "killed", "cancelled", "not_started", "checkpointed"]},
+  "shield": {"enum": ["none", "private", "guest", "sealed"]},
+  "stream_part": {
+   "type": "object",
+   "required": ["len", "trunc", "enc"],
+   "properties": {
+    "len": {"$ref": "#/$defs/u64"},
+    "trunc": {"type": "boolean"},
+    "enc": {"enum": ["utf8", "base64"]},
+    "head": {"type": "string", "maxLength": 87384},
+    "tail": {"type": "string", "maxLength": 43692},
+    "id": {"$ref": "#/$defs/b3"}
+   },
+   "description": "Head and tail of one stream (file 12, section 9). Bounds: capture_max 65,536 bytes as base64. enc is utf8 when both parts are UTF-8, else base64."
+  },
+  "u32": {"type": "integer", "minimum": 0, "maximum": 4294967295},
+  "u64": {"type": "integer", "minimum": 0, "maximum": 18446744073709551615},
+  "unix": {"type": "integer", "minimum": 0, "description": "Unix seconds, wall clock."}
+ }
+}

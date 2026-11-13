@@ -1,0 +1,6 @@
+{
+ "t": "req",
+ "id": 9,
+ "op": "blob_have",
+ "ids": ["b3:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"]
+}

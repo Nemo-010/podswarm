@@ -1,0 +1,168 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "$id": "https://podswarm.invalid/schemas/pool.1.schema.json",
+ "title": "Pool file",
+ "description": "The pool file pool.toml as parsed data (TOML tables as JSON objects). Home: file 08, section 1. Shield keys: file 13, section 11. Exits: file 14, section 7.",
+ "type": "object",
+ "additionalProperties": false,
+ "properties": {
+  "defaults": {"$ref": "#/$defs/defaults"},
+  "host": {
+   "type": "object",
+   "maxProperties": 1024,
+   "propertyNames": {"pattern": "^[a-z0-9][a-z0-9_-]{0,31}$"},
+   "properties": {"local": {"$ref": "#/$defs/local"}},
+   "additionalProperties": {"$ref": "#/$defs/host"},
+   "description": "Machine entries; at most pool_max (1,024)."
+  },
+  "group": {
+   "type": "object",
+   "propertyNames": {"pattern": "^[a-z0-9][a-z0-9_-]{0,31}$"},
+   "additionalProperties": {
+    "type": "object",
+    "required": ["members"],
+    "additionalProperties": false,
+    "properties": {"members": {"type": "array", "items": {"type": "string", "pattern": "^(?:@?[a-z0-9][a-z0-9_-]{0,31}|tag:[A-Za-z0-9_.+:-]{1,241})$"}}}
+   }
+  },
+  "cell": {"type": "object", "propertyNames": {"$ref": "#/$defs/label"}, "additionalProperties": {"$ref": "#/$defs/cell"}},
+  "exit": {"type": "object", "additionalProperties": {"$ref": "#/$defs/exit"}},
+  "residency": {
+   "type": "object",
+   "additionalProperties": false,
+   "properties": {"path": {"type": "object", "additionalProperties": {"$ref": "#/$defs/residency"}}}
+  }
+ },
+ "$comment": "Not expressible here: a cycle of groups, a cell named in a rule that is absent, a key of [defaults] that the user file also sets (exit 78).",
+ "$defs": {
+  "boundary": {"enum": ["none", "confined", "sandbox", "vm"]},
+  "duration": {
+   "oneOf": [
+    {"type": "integer", "minimum": 0},
+    {
+     "type": "string",
+     "pattern": "^(?:[0-9]+(?:\\.[0-9]+)?|(?:[0-9]+(?:\\.[0-9]+)?(?:ms|s|m|h|d))+|[0-9]+:[0-5][0-9]:[0-5][0-9]|[0-9]+-[0-9]+:[0-5][0-9]:[0-5][0-9])$"
+    }
+   ],
+   "description": "A duration: seconds as an integer, or the duration grammar of file 18, section 1."
+  },
+  "label": {"type": "string", "pattern": "^[a-z0-9-]{1,32}$", "description": "A cell, region or juris label (file 08)."},
+  "shield": {"enum": ["none", "private", "guest", "sealed"]},
+  "host": {
+   "type": "object",
+   "required": ["road"],
+   "additionalProperties": false,
+   "properties": {
+    "road": {
+     "type": "string",
+     "minLength": 1,
+     "pattern": "^(?!wss://)",
+     "description": "HOST, user@host, ssh://..., podssh://..., exec:CMD. A wss:// road is not a machine."
+    },
+    "tags": {"type": "array", "items": {"type": "string"}},
+    "trust": {"enum": ["own", "shared"], "default": "shared"},
+    "shield": {"$ref": "#/$defs/shield"},
+    "shield_require": {"type": "array", "items": {"const": "swap-locked"}},
+    "cache": {"type": "boolean", "default": true},
+    "leftovers": {"enum": ["bin", "none"], "default": "bin"},
+    "guest_tcg": {"type": "boolean", "default": false},
+    "seal_smt": {"type": "boolean", "default": true},
+    "seal_chip": {"type": "string", "pattern": "^[0-9a-fA-F]+$"},
+    "area_max": {"type": "integer", "minimum": 64},
+    "area": {"enum": ["auto", "memory", "sealed"], "default": "auto", "description": "Where the owned directories live at shield private (file 13, section 6.2)."},
+    "slots": {"type": "integer", "minimum": 1},
+    "res": {"$ref": "#/$defs/res"},
+    "cell": {"$ref": "#/$defs/label"},
+    "region": {"$ref": "#/$defs/label"},
+    "juris": {"$ref": "#/$defs/label"},
+    "time_limit": {"$ref": "#/$defs/duration"},
+    "uplink": {"type": "boolean", "default": false},
+    "auto": {"type": "boolean", "default": true},
+    "source": {"type": "string"},
+    "linger_s": {"type": "integer", "minimum": 0, "maximum": 86400},
+    "ssh": {"type": "object", "additionalProperties": false, "properties": {"max_sessions": {"type": "integer", "minimum": 1, "maximum": 10}}},
+    "ssh_args": {"type": "array", "items": {"type": "string"}},
+    "jump": {"type": "string"},
+    "remote_exe": {"type": "string"}
+   },
+   "allOf": [
+    {
+     "if": {"required": ["cell"]},
+     "then": {"not": {"anyOf": [{"required": ["region"]}, {"required": ["juris"]}]}},
+     "$comment": "A machine in a cell takes the labels of the cell (file 08, section 8.1)."
+    }
+   ],
+   "description": "A machine entry (file 08, section 1.1). linger_s, ssh.max_sessions, ssh_args, jump and remote_exe are the road keys of file 04."
+  },
+  "local": {
+   "type": "object",
+   "additionalProperties": false,
+   "description": "[host.local] sets only these keys (file 08, section 1.1).",
+   "properties": {
+    "tags": {"type": "array", "items": {"type": "string"}},
+    "slots": {"type": "integer", "minimum": 1},
+    "res": {"$ref": "#/$defs/res"},
+    "auto": {"type": "boolean", "default": true},
+    "uplink": {"type": "boolean", "default": false}
+   }
+  },
+  "cell": {
+   "type": "object",
+   "additionalProperties": false,
+   "properties": {
+    "road": {"type": "string", "pattern": "^(?:wss://|psw1s\\.)"},
+    "region": {"$ref": "#/$defs/label"},
+    "juris": {"$ref": "#/$defs/label"},
+    "trust": {"enum": ["own", "shared"]}
+   }
+  },
+  "exit": {
+   "type": "object",
+   "required": ["via"],
+   "additionalProperties": false,
+   "properties": {
+    "via": {"type": "string", "pattern": "^(?:host:[a-z0-9][a-z0-9_-]{0,31}|podssh:.+|socks5h://.+|wg:.+|warp|tailscale:.+|netbird:[0-9]{1,5})$"},
+    "trust": {"enum": ["own", "shared"]},
+    "cell": {"$ref": "#/$defs/label"},
+    "region": {"$ref": "#/$defs/label"},
+    "juris": {"$ref": "#/$defs/label"}
+   }
+  },
+  "defaults": {
+   "type": "object",
+   "description": "Settings of scope run and shape (file 19, section 2), and the pool keys of file 08, section 1.2.",
+   "properties": {
+    "on": {"type": "string"},
+    "cell": {"$ref": "#/$defs/label"},
+    "local": {"type": "boolean"},
+    "local_under_ms": {"type": "integer", "minimum": 0, "maximum": 10000},
+    "place_wait_ms": {"type": "integer", "minimum": 0, "maximum": 10000},
+    "net": {
+     "type": "string",
+     "pattern": "^(?:host|pool|home|none|exit:[A-Za-z0-9_-]{1,32})(?:;(?:require=(?:any|advisory|enforced)|strict=[01]|members=[A-Za-z0-9_-]{1,32}(?:\\+[A-Za-z0-9_-]{1,32})*|balance=(?:weighted|rr|minrtt|leastload|protect)|dns=(?:policy|host)|udp=(?:auto|off)|home=[0-9]{1,5}(?:,[0-9]{1,5}){0,15}))*$"
+    },
+    "shield": {"$ref": "#/$defs/shield"},
+    "spread": {"enum": ["off", "on"]}
+   }
+  },
+  "residency": {
+   "type": "object",
+   "additionalProperties": false,
+   "description": "A residency rule (file 08, section 8.4). An unknown key is a hard error.",
+   "properties": {
+    "allow_cell": {"type": "array", "items": {"$ref": "#/$defs/label"}},
+    "deny_cell": {"type": "array", "items": {"$ref": "#/$defs/label"}},
+    "allow_region": {"type": "array", "items": {"$ref": "#/$defs/label"}},
+    "allow_juris": {"type": "array", "items": {"$ref": "#/$defs/label"}},
+    "shield_min": {"$ref": "#/$defs/shield"},
+    "boundary_min": {"$ref": "#/$defs/boundary"}
+   }
+  },
+  "res": {
+   "type": "object",
+   "maxProperties": 16,
+   "propertyNames": {"type": "string", "pattern": "^(?!(?:cores|mem|disk|time)$)[a-z][a-z0-9_]{0,31}$"},
+   "additionalProperties": {"type": "integer", "minimum": 1, "maximum": 1000000}
+  }
+ }
+}

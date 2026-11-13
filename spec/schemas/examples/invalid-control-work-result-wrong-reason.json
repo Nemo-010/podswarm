@@ -1,0 +1,19 @@
+{
+ "t": "result",
+ "batch": [
+  [
+   41,
+   1,
+   "signaled",
+   null,
+   9,
+   1,
+   1,
+   1,
+   1,
+   {
+    "reason": "self_fence"
+   }
+  ]
+ ]
+}

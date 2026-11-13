@@ -1,0 +1,116 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "$id": "https://podswarm.invalid/schemas/plugin.1.schema.json",
+ "title": "Plugin line",
+ "description": "One JSON line between a host and a plugin: the first line, a request, an answer, or the --psw-describe line. Home: file 17, sections 4 and 7. The road kind carries the byte stream of a link and has no JSON line.",
+ "type": "object",
+ "oneOf": [
+  {
+   "type": "object",
+   "required": ["psw_plugin", "kind", "name", "version", "ops"],
+   "description": "The first line of a plugin.",
+   "properties": {
+    "psw_plugin": {"const": 1},
+    "kind": {
+     "enum": ["ckpt", "admit"]
+    },
+    "name": {"type": "string", "pattern": "^[a-z0-9-]{1,32}$"},
+    "version": {"type": "string"},
+    "ops": {"type": "array", "minItems": 1, "items": {"enum": ["put", "get", "rm", "admit"]}}
+   },
+   "allOf": [
+    {"if": {"properties": {"kind": {"const": "ckpt"}}}, "then": {"properties": {"ops": {"items": {"enum": ["put", "get", "rm"]}}}}},
+    {"if": {"properties": {"kind": {"const": "admit"}}}, "then": {"properties": {"ops": {"items": {"const": "admit"}}}}}
+   ]
+  },
+  {
+   "oneOf": [
+    {
+     "type": "object",
+     "required": ["id", "op", "dir", "ckpt"],
+     "properties": {
+      "id": {"type": "integer", "minimum": 0},
+      "op": {"const": "put"},
+      "dir": {"type": "string", "minLength": 1},
+      "ckpt": {"type": "string"},
+      "label": {"type": "string"}
+     }
+    },
+    {
+     "type": "object",
+     "required": ["id", "op", "ref", "dir"],
+     "properties": {"id": {"type": "integer", "minimum": 0}, "op": {"const": "get"}, "ref": {"type": "string"}, "dir": {"type": "string", "minLength": 1}}
+    },
+    {
+     "type": "object",
+     "required": ["id", "op", "ref"],
+     "properties": {"id": {"type": "integer", "minimum": 0}, "op": {"const": "rm"}, "ref": {"type": "string"}}
+    },
+    {
+     "type": "object",
+     "required": ["id", "op", "submitter", "cell", "run", "shape", "usage"],
+     "properties": {
+      "id": {"type": "integer", "minimum": 0},
+      "op": {"const": "admit"},
+      "submitter": {"$ref": "#/$defs/fingerprint"},
+      "cell": {"$ref": "#/$defs/label"},
+      "run": {"$ref": "#/$defs/u64"},
+      "shape": {
+       "type": "object",
+       "properties": {
+        "needs": {"type": "object"},
+        "timeout_s": {"type": ["integer", "null"]},
+        "tags": {"$ref": "https://podswarm.invalid/schemas/shape.1.schema.json#/properties/tags"}
+       }
+      },
+      "usage": {
+       "type": "object",
+       "required": ["running", "cores_m_running", "open_runs"],
+       "properties": {"running": {"$ref": "#/$defs/u64"}, "cores_m_running": {"$ref": "#/$defs/u64"}, "open_runs": {"$ref": "#/$defs/u64"}}
+      }
+     }
+    }
+   ]
+  },
+  {
+   "oneOf": [
+    {
+     "type": "object",
+     "required": ["id", "ok"],
+     "properties": {"id": {"type": "integer", "minimum": 0}, "ok": {"const": true}, "ref": {"type": "string"}},
+     "description": "Success; put answers ref (stored as external_ref)."
+    },
+    {
+     "type": "object",
+     "required": ["id", "ok", "code"],
+     "properties": {
+      "id": {"type": "integer", "minimum": 0},
+      "ok": {"const": false},
+      "code": {"enum": ["retry", "refused", "not_found", "unsupported", "internal"]},
+      "text": {"type": "string"},
+      "retry_after_ms": {"$ref": "#/$defs/u64"},
+      "reason": {"type": "string"}
+     }
+    }
+   ]
+  },
+  {
+   "type": "object",
+   "required": ["schema", "name", "version", "summary", "proto"],
+   "description": "The answer to --psw-describe (file 17, section 4).",
+   "properties": {
+    "schema": {"const": 1},
+    "name": {"type": "string", "pattern": "^[a-z0-9-]{1,32}$"},
+    "version": {"type": "string"},
+    "summary": {"type": "string"},
+    "proto": {"const": 1}
+   }
+  }
+ ],
+ "$comment": "A line is one JSON object with no newline inside. The admit refusal maps to err{policy, reason} (file 17, section 7).",
+ "$defs": {
+  "fingerprint": {"type": "string", "pattern": "^SHA256:[A-Za-z0-9+/]{43}$", "description": "The SHA256: fingerprint form of pod_identity (D-129)."},
+  "label": {"type": "string", "pattern": "^[a-z0-9-]{1,32}$", "description": "A cell, region or juris label (file 08)."},
+  "u64": {"type": "integer", "minimum": 0, "maximum": 18446744073709551615}
+ }
+}

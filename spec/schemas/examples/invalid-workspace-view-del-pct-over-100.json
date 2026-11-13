@@ -1,0 +1,24 @@
+{
+ "defaults": {
+  "retries": 1,
+  "timeout_s": 7200,
+  "capture_max": 8192,
+  "net": "pool;require=enforced"
+ },
+ "residency": {
+  "allow_cell": [
+   "eu"
+  ],
+  "shield_min": "private"
+ },
+ "view": {
+  "pull": [
+   "target/release/mytool"
+  ],
+  "protect": [
+   "secrets/**"
+  ],
+  "view_put_max_mib": 64,
+  "view_del_max_pct": 101
+ }
+}

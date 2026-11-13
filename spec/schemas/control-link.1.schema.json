@@ -1,0 +1,188 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "$id": "https://podswarm.invalid/schemas/control-link.1.schema.json",
+ "title": "Control: link messages",
+ "description": "hello, ready, bye and err on the control stream. Home: file 04, section 9 (hello, ready) and file 05, sections 3 and 11 (bye, err). A receiver ignores an object field that it does not know.",
+ "type": "object",
+ "required": ["t"],
+ "properties": {"t": {"enum": ["hello", "ready", "bye", "err"]}},
+ "oneOf": [
+  {
+   "type": "object",
+   "required": ["t", "proto", "role", "inst", "sw", "features"],
+   "properties": {
+    "t": {"const": "hello"},
+    "proto": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "integer", "minimum": 1}},
+    "role": {"enum": ["worker", "submitter", "hub"]},
+    "inst": {"$ref": "#/$defs/hex16"},
+    "sw": {"type": "string", "pattern": "^podswarm/\\S+ \\S+$"},
+    "bin": {
+     "type": "object",
+     "required": ["size", "sha256"],
+     "properties": {"size": {"$ref": "#/$defs/u64"}, "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}
+    },
+    "features": {"type": "array", "items": {"type": "string", "pattern": "^[a-z][a-z0-9_]*\\.[0-9]+$", "description": "A feature name name.N (D-23)."}},
+    "caps": {"$ref": "#/$defs/caps"},
+    "tags": {"type": "array", "items": {"type": "string"}},
+    "lifetime_s": {"$ref": "#/$defs/u64"},
+    "enrol": {
+     "type": "object",
+     "required": ["invite", "proof"],
+     "properties": {
+      "invite": {"$ref": "#/$defs/hex16"},
+      "proof": {"type": "string", "pattern": "^[A-Za-z0-9_-]+$", "description": "The enrol signature, base64url without padding (file 16, section 7.4)."},
+      "name": {"type": "string", "minLength": 1, "maxLength": 64}
+     }
+    },
+    "stmt": {
+     "type": "object",
+     "required": ["doc", "key", "sig"],
+     "properties": {"doc": {"type": "string", "maxLength": 2048}, "key": {"type": "string", "pattern": "^[0-9a-f]{64}$"}, "sig": {"type": "string"}}
+    },
+    "rotate": {"$comment": "Later (file 24)."}
+   },
+   "description": "The first message of the dialer (file 04, section 9). Before ready a message has at most 4,096 bytes."
+  },
+  {
+   "type": "object",
+   "required": ["t", "proto", "features", "swarm", "gen", "hb_s", "limits"],
+   "properties": {
+    "t": {"const": "ready"},
+    "proto": {"type": "integer", "minimum": 1},
+    "features": {"type": "array", "items": {"type": "string", "pattern": "^[a-z][a-z0-9_]*\\.[0-9]+$", "description": "A feature name name.N (D-23)."}},
+    "wid": {"type": "integer", "minimum": 1, "maximum": 4294967295},
+    "swarm": {"$ref": "#/$defs/hex32", "description": "The 16-byte swarm id in hex (file 04, section 9)."},
+    "gen": {"$ref": "#/$defs/hex16"},
+    "hb_s": {"type": "integer", "minimum": 2, "maximum": 60},
+    "limits": {
+     "type": "object",
+     "additionalProperties": {"type": "integer", "minimum": 0},
+     "properties": {
+      "msg": {"type": "integer", "maximum": 1048576},
+      "inflate": {"type": "integer", "maximum": 4194304},
+      "offer_rows": {"type": "integer", "maximum": 1000},
+      "result_rows": {"type": "integer", "maximum": 1000},
+      "hb_rows": {"type": "integer", "maximum": 8192},
+      "blob_max_mib": {"type": "integer"},
+      "max_blob_mib": {"type": "integer"},
+      "max_ckpt_mib": {"type": "integer"},
+      "max_spec_bytes": {"type": "integer"},
+      "max_output_bytes": {"type": "integer"}
+     }
+    },
+    "tags": {"type": "array", "items": {"type": "string"}},
+    "pins": {"type": "array", "maxItems": 4, "items": {"$ref": "#/$defs/fingerprint"}},
+    "reconnect_jitter_ms": {"$ref": "#/$defs/u32"},
+    "cell": {
+     "type": "object",
+     "required": ["name"],
+     "properties": {"name": {"$ref": "#/$defs/label"}, "region": {"$ref": "#/$defs/label"}, "juris": {"$ref": "#/$defs/label"}}
+    }
+   },
+   "description": "The answer of the listener (file 04, section 9)."
+  },
+  {
+   "type": "object",
+   "required": ["t", "reason"],
+   "properties": {
+    "t": {"const": "bye"},
+    "reason": {"enum": ["home_exit", "drain", "lifetime", "idle", "done"], "description": "File 05, section 3."}
+   }
+  },
+  {
+   "type": "object",
+   "required": ["t", "code", "text"],
+   "properties": {
+    "t": {"const": "err"},
+    "code": {"$ref": "#/$defs/err_code"},
+    "text": {"$ref": "#/$defs/reason_text"},
+    "fatal": {"type": "boolean"},
+    "retry_after_ms": {"$ref": "#/$defs/u64"},
+    "items": {"type": "array"},
+    "limit": {"type": "integer", "minimum": 0},
+    "used": {"type": "integer", "minimum": 0},
+    "scope": {"enum": ["submitter", "swarm"]},
+    "reason": {"type": "string"},
+    "id": {"$ref": "#/$defs/u64", "description": "The id of the req that this answers (file 05, section 9)."},
+    "asked": {"$ref": "#/$defs/shield"},
+    "max": {"$ref": "#/$defs/shield"},
+    "field": {"type": "string"},
+    "cell": {"$ref": "#/$defs/label"}
+   },
+   "description": "An error (file 05, sections 3 and 11). fatal is optional, default false.",
+   "allOf": [
+    {"if": {"properties": {"code": {"const": "busy"}}}, "then": {"required": ["retry_after_ms"]}},
+    {"if": {"properties": {"code": {"const": "quota"}}}, "then": {"required": ["limit", "used", "scope"]}},
+    {"if": {"properties": {"code": {"const": "wrong_cell"}}}, "then": {"required": ["cell"]}},
+    {"if": {"properties": {"code": {"const": "shield_unavailable"}}}, "then": {"required": ["asked", "max", "reason"]}}
+   ]
+  }
+ ],
+ "$defs": {
+  "boundary": {"enum": ["none", "confined", "sandbox", "vm"]},
+  "err_code": {
+   "enum": [
+    "bad_request",
+    "bad_state",
+    "attempt_live",
+    "unauthorized",
+    "revoked",
+    "duplicate_identity",
+    "unsupported",
+    "busy",
+    "too_large",
+    "policy",
+    "needs_unsatisfiable",
+    "shield_unavailable",
+    "no_cell",
+    "wrong_cell",
+    "quota",
+    "not_found",
+    "internal"
+   ]
+  },
+  "fingerprint": {"type": "string", "pattern": "^SHA256:[A-Za-z0-9+/]{43}$", "description": "The SHA256: fingerprint form of pod_identity (D-129)."},
+  "hex16": {"type": "string", "pattern": "^[0-9a-f]{16}$"},
+  "hex32": {"type": "string", "pattern": "^[0-9a-f]{32}$"},
+  "label": {"type": "string", "pattern": "^[a-z0-9-]{1,32}$", "description": "A cell, region or juris label (file 08)."},
+  "reason_text": {"type": "string", "maxLength": 200, "description": "Reason text: 200 bytes, control characters escaped (file 05, section 10)."},
+  "shield": {"enum": ["none", "private", "guest", "sealed"]},
+  "u32": {"type": "integer", "minimum": 0, "maximum": 4294967295},
+  "u64": {"type": "integer", "minimum": 0, "maximum": 18446744073709551615},
+  "unix": {"type": "integer", "minimum": 0, "description": "Unix seconds, wall clock."},
+  "caps": {
+   "type": "object",
+   "description": "Worker capacity and capabilities (file 08, section 2.1). At most 3,072 bytes.",
+   "properties": {
+    "os": {"enum": ["linux", "android", "macos", "windows", "freebsd", "openbsd", "netbsd"]},
+    "arch": {
+     "enum": ["x86_64", "aarch64", "armv7", "arm", "i686", "riscv64", "loongarch64", "s390x", "powerpc64le"],
+     "description": "File 08, section 2.1. arm is ARMv6 (armv6l)."
+    },
+    "target": {"type": "string"},
+    "cores": {"$ref": "#/$defs/u32"},
+    "mem_mib": {"$ref": "#/$defs/u64"},
+    "disk_mib": {"$ref": "#/$defs/u64"},
+    "res": {"type": "object", "additionalProperties": {"type": "integer", "minimum": 1, "maximum": 1000000}},
+    "slots": {"$ref": "#/$defs/u32"},
+    "speed": {"$ref": "#/$defs/u32"},
+    "speed_all": {"$ref": "#/$defs/u32"},
+    "shell": {
+     "type": "object",
+     "required": ["path", "kind"],
+     "properties": {"path": {"type": "string"}, "kind": {"enum": ["dash", "bash", "ash", "mksh", "zsh", "unknown"]}, "start_us": {"$ref": "#/$defs/u64"}}
+    },
+    "interp": {"type": "array", "items": {"type": "string"}},
+    "boundary": {"type": "array", "items": {"$ref": "#/$defs/boundary"}},
+    "confine": {"type": "array", "items": {"type": "string"}},
+    "limits": {"type": "object", "additionalProperties": {"enum": ["enforced", "polled", "reported", "none"]}},
+    "containment": {"enum": ["cgroup", "pidns", "subreaper", "reaper", "job", "session"]},
+    "shield": {"type": "object", "properties": {"max": {"$ref": "#/$defs/shield"}}},
+    "view": {"type": "array", "items": {"enum": ["fuse", "fuse-userns", "trap", "sync"]}},
+    "net": {"type": "object"},
+    "pty": {"type": "boolean"},
+    "features": {"type": "array", "items": {"type": "string", "pattern": "^[a-z][a-z0-9_]*\\.[0-9]+$", "description": "A feature name name.N (D-23)."}}
+   }
+  }
+ }
+}

@@ -1,0 +1,12 @@
+sqlite-FULL  enqueue, 1000 per commit           n= 100000    0.744s     134344 ops/s
+sqlite-FULL  claim(1 commit)+ack(1 commit) /task n=   3000   18.228s        165 ops/s
+sqlite-FULL  claim+ack, 100 per commit          n=  30000    2.664s      11262 ops/s
+sqlite-NORMAL enqueue, 1000 per commit           n= 100000    0.329s     304032 ops/s
+sqlite-NORMAL claim(1 commit)+ack(1 commit) /task n=   3000    0.435s       6903 ops/s
+sqlite-NORMAL claim+ack, 100 per commit          n=  30000    0.356s      84175 ops/s
+redb         enqueue, 1000 per commit           n= 100000    0.799s     125216 ops/s
+redb         claim(1 commit)+ack(1 commit) /task n=   3000    8.090s        371 ops/s
+redb         claim+ack, 100 per commit          n=  30000    1.194s      25126 ops/s
+fjall        enqueue, 1000 per commit           n= 100000    0.521s     192082 ops/s
+fjall        claim(1 commit)+ack(1 commit) /task n=   3000   17.616s        170 ops/s
+fjall        claim+ack, 100 per commit          n=  30000   37.666s        796 ops/s

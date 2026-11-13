@@ -1,0 +1,46 @@
+{
+ "schema": 1,
+ "kind": "run.result",
+ "run_id": 12,
+ "task_id": 345,
+ "attempt_no": 1,
+ "ok": true,
+ "outcome": "exited",
+ "code": 0,
+ "signal": null,
+ "reason": null,
+ "worker": {
+  "wid": 3,
+  "name": "big",
+  "cell": "home",
+  "boundary": "confined",
+  "shield": "private",
+  "juris": null
+ },
+ "where": {
+  "road": "ssh",
+  "view": "fuse",
+  "net": "pool"
+ },
+ "wall_ms": 8123,
+ "user_ms": 15010,
+ "sys_ms": 820,
+ "rss_kib": 912340,
+ "in_bytes": 10240,
+ "out_bytes": 482113,
+ "net_bytes": null,
+ "started_unix": 1794000100,
+ "ended_unix": 1794000108,
+ "stdout": {
+  "len": 482113,
+  "trunc": true,
+  "enc": "utf8",
+  "head": "...",
+  "tail": "..."
+ },
+ "stderr": {
+  "len": 0,
+  "trunc": false,
+  "enc": "latin1"
+ }
+}

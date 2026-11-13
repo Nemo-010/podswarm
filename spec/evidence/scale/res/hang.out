@@ -1,0 +1,5 @@
+RESULT workers=200 bundle=10 dur=strict tail=true lease_wait=true ckpt=idle tasks=114180 wall=5.04s tasks_per_s=22659 mean_bundle=10.0
+  pull_lat_ms p50=37.61 p99=509.20  result_ack_lat_ms p50=38.57 p99=89.81
+  commits=150 commits_per_s=30 events_per_commit=152.2 commit_ms p50=25.52 p99=40.18 max=41.40
+  cpu_s total=2.13 writer=1.75 sched=0.39 loadgen=-0.00  coord_cores=0.42  rss_hwm_mib=13
+  per task coord cpu us: writer=15 sched=3; wal_max_bytes=21914312 db_bytes=272084992 idle_ckpts=14 (717ms) startup_ready_queue_s=0.09

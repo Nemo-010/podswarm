@@ -1,0 +1,6 @@
+{
+ "t": "result",
+ "batch": [
+  [41, 1, "exited", 0, null, 10, 5, 1, 900, {"shield": {"asked": "sealed", "got": "sealed", "mode": "attested", "cache": true, "crl": "unknown"}}]
+ ]
+}

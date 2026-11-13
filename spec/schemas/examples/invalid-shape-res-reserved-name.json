@@ -1,0 +1,12 @@
+{
+ "schema": 1,
+ "argv": [
+  "make",
+  "-j8"
+ ],
+ "needs": {
+  "res": {
+   "cores": 2
+  }
+ }
+}

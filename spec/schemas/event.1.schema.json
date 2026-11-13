@@ -1,0 +1,245 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "$id": "https://podswarm.invalid/schemas/event.1.schema.json",
+ "title": "Event",
+ "description": "An event of podswarm watch --jsonl, the stdin of a hook, and the body of a webhook. Home: file 17, sections 1 and 5. Usage fields of task.end: file 17, section 9.",
+ "oneOf": [
+  {
+   "type": "object",
+   "required": ["schema", "kind", "id", "type", "time_unix", "data"],
+   "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "event"},
+    "seq": {"$ref": "#/$defs/u64"},
+    "id": {"type": "string", "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$", "description": "A ULID."},
+    "type": {
+     "enum": [
+      "run.start",
+      "run.end",
+      "task.end",
+      "worker.join",
+      "worker.leave",
+      "checkpoint.saved",
+      "admission.refused",
+      "scale.tick",
+      "checkpoint.damaged"
+     ]
+    },
+    "time_unix": {"$ref": "#/$defs/unix"},
+    "cell": {"$ref": "#/$defs/label"},
+    "run_id": {"$ref": "#/$defs/u64"},
+    "task_id": {"$ref": "#/$defs/u64"},
+    "attempt_no": {"type": "integer", "minimum": 1, "maximum": 4294967295},
+    "data": {"type": "object"}
+   },
+   "allOf": [
+    {
+     "if": {"properties": {"type": {"const": "run.start"}}},
+     "then": {
+      "properties": {
+       "data": {
+        "type": "object",
+        "required": ["name", "submitter", "tasks", "io", "delivery", "tags"],
+        "properties": {"tasks": {"$ref": "#/$defs/u64"}, "io": {"enum": ["capture", "attached"]}, "delivery": {"enum": ["at_least_once", "at_most_once"]}}
+       }
+      }
+     }
+    },
+    {
+     "if": {"properties": {"type": {"const": "run.end"}}},
+     "then": {
+      "properties": {
+       "data": {
+        "type": "object",
+        "required": ["state", "counts", "wall_ms"],
+        "properties": {
+         "state": {"enum": ["succeeded", "failed", "cancelled", "halted"]},
+         "counts": {
+          "type": "object",
+          "required": ["succeeded", "failed", "cancelled", "lost"],
+          "properties": {
+           "succeeded": {"$ref": "#/$defs/u64"},
+           "failed": {"$ref": "#/$defs/u64"},
+           "cancelled": {"$ref": "#/$defs/u64"},
+           "lost": {"$ref": "#/$defs/u64"}
+          }
+         },
+         "wall_ms": {"$ref": "#/$defs/u64"}
+        }
+       }
+      }
+     }
+    },
+    {
+     "if": {"properties": {"type": {"const": "task.end"}}},
+     "then": {
+      "properties": {
+       "data": {
+        "type": "object",
+        "required": ["outcome", "code", "signal", "reason", "accepted", "worker"],
+        "properties": {
+         "outcome": {"$ref": "#/$defs/outcome"},
+         "code": {"type": ["integer", "null"]},
+         "accepted": {"type": "boolean"},
+         "wall_ms": {"$ref": "#/$defs/u64"},
+         "user_ms": {"$ref": "#/$defs/u64"},
+         "sys_ms": {"$ref": "#/$defs/u64"},
+         "rss_kib": {"$ref": "#/$defs/u64"},
+         "cores_m": {"$ref": "#/$defs/u32"},
+         "mem_mib": {"$ref": "#/$defs/u64"},
+         "reserved_mcore_ms": {"$ref": "#/$defs/u64"},
+         "boundary": {"$ref": "#/$defs/boundary"},
+         "shield": {"$ref": "#/$defs/shield"},
+         "wid": {"$ref": "#/$defs/u32"},
+         "class": {},
+         "in_bytes": {"$ref": "#/$defs/u64"},
+         "out_bytes": {"$ref": "#/$defs/u64"},
+         "ckpt_count": {"$ref": "#/$defs/u64"},
+         "net_bytes": {"type": ["integer", "null"], "minimum": 0},
+         "submitter": {"type": "string"},
+         "tags": {},
+         "signal": {"type": ["integer", "null"]}
+        }
+       }
+      }
+     }
+    },
+    {
+     "if": {"properties": {"type": {"const": "worker.join"}}},
+     "then": {
+      "properties": {
+       "data": {
+        "type": "object",
+        "required": ["wid", "name", "tags", "boundary", "shield", "juris", "caps", "road"],
+        "properties": {"wid": {"$ref": "#/$defs/u32"}, "boundary": {"$ref": "#/$defs/boundary"}, "shield": {"$ref": "#/$defs/shield"}}
+       }
+      }
+     }
+    },
+    {
+     "if": {"properties": {"type": {"const": "worker.leave"}}},
+     "then": {
+      "properties": {
+       "data": {
+        "type": "object",
+        "required": ["wid", "reason", "attempts_lost"],
+        "properties": {
+         "wid": {"$ref": "#/$defs/u32"},
+         "reason": {"enum": ["bye", "drain", "lifetime", "lost", "revoked"]},
+         "attempts_lost": {"$ref": "#/$defs/u32"}
+        }
+       }
+      }
+     }
+    },
+    {
+     "if": {"properties": {"type": {"const": "checkpoint.saved"}}},
+     "then": {
+      "properties": {
+       "data": {
+        "type": "object",
+        "required": ["ckpt", "seq", "kind", "bytes", "files", "label", "external_ref"],
+        "properties": {
+         "ckpt": {"type": "string", "pattern": "^(?:[a-z0-9-]{1,32}/)?[0-9]+/[0-9]+/[0-9]+$"},
+         "seq": {"type": "integer", "minimum": 1},
+         "kind": {"enum": ["files", "process", "guest"]},
+         "bytes": {"$ref": "#/$defs/u64"},
+         "files": {"$ref": "#/$defs/u64"}
+        }
+       }
+      }
+     }
+    },
+    {
+     "if": {"properties": {"type": {"const": "checkpoint.damaged"}}},
+     "then": {
+      "properties": {
+       "data": {
+        "type": "object",
+        "required": ["ckpt", "seq", "reason"],
+        "properties": {
+         "ckpt": {"type": "string", "pattern": "^(?:[a-z0-9-]{1,32}/)?[0-9]+/[0-9]+/[0-9]+$"},
+         "seq": {"type": "integer", "minimum": 1},
+         "reason": {"enum": ["missing", "mismatch"]}
+        }
+       }
+      }
+     }
+    },
+    {
+     "if": {"properties": {"type": {"const": "admission.refused"}}},
+     "then": {
+      "properties": {
+       "data": {
+        "type": "object",
+        "required": ["submitter", "code", "scope", "limit", "used"],
+        "properties": {"code": {"$ref": "#/$defs/err_code"}, "scope": {"enum": ["submitter", "swarm"]}}
+       }
+      }
+     }
+    },
+    {
+     "if": {"properties": {"type": {"const": "scale.tick"}}},
+     "then": {
+      "properties": {
+       "data": {
+        "type": "object",
+        "required": ["classes", "workers", "free_slots", "eta_s"],
+        "properties": {
+         "classes": {
+          "type": "array",
+          "items": {
+           "type": "object",
+           "required": ["class", "ready", "running"],
+           "properties": {"ready": {"$ref": "#/$defs/u64"}, "running": {"$ref": "#/$defs/u64"}}
+          }
+         },
+         "workers": {"$ref": "#/$defs/u64"},
+         "free_slots": {"$ref": "#/$defs/u64"},
+         "eta_s": {"type": ["integer", "null"], "minimum": 0}
+        }
+       }
+      }
+     }
+    }
+   ],
+   "$comment": "An event has at most 16 KiB. seq exists in a swarm only. data never holds output text, input text or a secret."
+  },
+  {
+   "type": "object",
+   "required": ["schema", "kind", "type", "oldest"],
+   "additionalProperties": false,
+   "properties": {"schema": {"const": 1}, "kind": {"const": "event"}, "type": {"const": "gap"}, "oldest": {"$ref": "#/$defs/u64"}}
+  }
+ ],
+ "$defs": {
+  "boundary": {"enum": ["none", "confined", "sandbox", "vm"]},
+  "err_code": {
+   "enum": [
+    "bad_request",
+    "bad_state",
+    "attempt_live",
+    "unauthorized",
+    "revoked",
+    "duplicate_identity",
+    "unsupported",
+    "busy",
+    "too_large",
+    "policy",
+    "needs_unsatisfiable",
+    "shield_unavailable",
+    "no_cell",
+    "wrong_cell",
+    "quota",
+    "not_found",
+    "internal"
+   ]
+  },
+  "label": {"type": "string", "pattern": "^[a-z0-9-]{1,32}$", "description": "A cell, region or juris label (file 08)."},
+  "outcome": {"enum": ["exited", "signaled", "timeout", "spawn_failed", "killed", "cancelled", "not_started", "checkpointed"]},
+  "shield": {"enum": ["none", "private", "guest", "sealed"]},
+  "u32": {"type": "integer", "minimum": 0, "maximum": 4294967295},
+  "u64": {"type": "integer", "minimum": 0, "maximum": 18446744073709551615},
+  "unix": {"type": "integer", "minimum": 0, "description": "Unix seconds, wall clock."}
+ }
+}

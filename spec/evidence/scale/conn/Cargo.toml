@@ -1,0 +1,13 @@
+[package]
+name = "conn"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+futures-util = "0.3.34"
+libc = "0.2.191"
+rcgen = "0.14.10"
+rustls = { version = "0.23.46", default-features = false, features = ["ring", "std", "tls12"] }
+tokio = { version = "1.54.1", features = ["full"] }
+tokio-rustls = { version = "0.26.6", default-features = false, features = ["ring", "tls12"] }
+tokio-tungstenite = "0.30.0"

@@ -1,0 +1,11 @@
+{
+ "c": [
+  "coord.example:443",
+  "coord2.example:8443"
+ ],
+ "k": "SHA256:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+ "i": "4f2a9c01d3b7e650",
+ "s": "AAAAAAAAAAAAAAAAAAAAAA",
+ "w": "BBBBBBBBBBBBBBBBBBBBBB",
+ "x": 1794086400
+}

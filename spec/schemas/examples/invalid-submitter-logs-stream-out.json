@@ -1,0 +1,7 @@
+{
+ "t": "req",
+ "id": 3,
+ "op": "logs",
+ "task_id": 345,
+ "stream": "out"
+}

@@ -1,0 +1,12 @@
+RESULT workers=200 bundle=10 dur=strict tail=true lease_wait=true ckpt=idle tasks=500000 wall=13.44s tasks_per_s=37211 mean_bundle=9.8
+  pull_lat_ms p50=23.19 p99=44.84  result_ack_lat_ms p50=23.19 p99=45.60
+  commits=672 commits_per_s=50 events_per_commit=151.1 commit_ms p50=17.84 p99=26.51 max=30.89
+  cpu_s total=10.22 writer=7.95 sched=1.87 loadgen=0.40  coord_cores=0.73  rss_hwm_mib=15
+  per task coord cpu us: writer=16 sched=4; wal_max_bytes=696403632 db_bytes=353136640 idle_ckpts=6 (0ms) startup_ready_queue_s=0.07
+  VERIFY (python, outside): tasks state=5: 500000 results: 500000 attempts ended: 500000 dup accepted: 0 state3 left: 0
+RESULT workers=200 bundle=10 dur=strict tail=true lease_wait=true ckpt=auto tasks=449080 wall=15.04s tasks_per_s=29851 mean_bundle=10.0
+  pull_lat_ms p50=31.29 p99=61.85  result_ack_lat_ms p50=31.31 p99=61.53
+  commits=623 commits_per_s=41 events_per_commit=144.2 commit_ms p50=20.42 p99=39.51 max=413.67
+  cpu_s total=9.74 writer=7.47 sched=1.85 loadgen=0.42  coord_cores=0.62  rss_hwm_mib=13
+  per task coord cpu us: writer=17 sched=4; wal_max_bytes=5434312 db_bytes=342401024 idle_ckpts=0 (0ms) startup_ready_queue_s=0.07
+  VERIFY (python, outside): tasks state=5: 449080 results: 449080 attempts ended: 449080 dup accepted: 0 state3 left: 0

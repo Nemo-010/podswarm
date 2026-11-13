@@ -1,0 +1,9 @@
+{
+ "psw_plugin": 2,
+ "kind": "ckpt",
+ "name": "git",
+ "version": "1",
+ "ops": [
+  "put"
+ ]
+}

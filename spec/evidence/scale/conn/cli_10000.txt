@@ -1,0 +1,1 @@
+CLIENT connected=10000 of 10000 in 2.24s  handshake_ms p50=409 p99=2051  client_rss_mib=410

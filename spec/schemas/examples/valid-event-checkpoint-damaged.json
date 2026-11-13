@@ -1,0 +1,13 @@
+{
+ "schema": 1,
+ "kind": "event",
+ "seq": 4712,
+ "id": "01JC0000000000000000000000",
+ "type": "checkpoint.damaged",
+ "time_unix": 1794000130,
+ "cell": "eu1",
+ "run_id": 12,
+ "task_id": 345,
+ "attempt_no": 2,
+ "data": {"ckpt": "eu1/12/345/3", "seq": 3, "reason": "missing"}
+}

@@ -1,0 +1,10 @@
+{
+ "t": "req",
+ "id": 3,
+ "op": "logs",
+ "task_id": 345,
+ "attempt_no": 1,
+ "stream": "stdout",
+ "offset": 0,
+ "follow": true
+}

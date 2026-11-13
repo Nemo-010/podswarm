@@ -1,0 +1,7 @@
+{
+ "id": 1,
+ "op": "put",
+ "dir": "/work/t/ckpt",
+ "ckpt": "eu1/12/345/7",
+ "label": "epoch-7"
+}

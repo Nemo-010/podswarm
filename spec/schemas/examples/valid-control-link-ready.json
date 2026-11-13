@@ -1,0 +1,30 @@
+{
+ "t": "ready",
+ "proto": 1,
+ "features": [
+  "zstd.1",
+  "io.1",
+  "pty.1",
+  "attach.1"
+ ],
+ "wid": 3,
+ "swarm": "5b0c9e7a11f3d2c48e6a0f17c2d94b35",
+ "gen": "a17be0c35d9f4e28",
+ "hb_s": 10,
+ "limits": {
+  "msg": 1048576,
+  "inflate": 4194304,
+  "offer_rows": 1000,
+  "result_rows": 1000,
+  "hb_rows": 8192
+ },
+ "reconnect_jitter_ms": 0,
+ "pins": [
+  "SHA256:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+ ],
+ "cell": {
+  "name": "eu1",
+  "region": "eu-west",
+  "juris": "eu"
+ }
+}

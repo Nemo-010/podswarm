@@ -1,0 +1,15 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "$id": "https://podswarm.invalid/schemas/control.1.schema.json",
+ "title": "Control message",
+ "description": "A message on the control stream (stream 1) of a link, after the framing of file 04, section 8. Home: file 05, section 3. The three groups are control-link (file 04), control-work (file 05) and control-ckpt (file 15). Submitter messages (req, rep, event) are in submitter.1.",
+ "type": "object",
+ "required": ["t"],
+ "properties": {"t": {"type": "string"}},
+ "oneOf": [
+  {"$ref": "https://podswarm.invalid/schemas/control-link.1.schema.json"},
+  {"$ref": "https://podswarm.invalid/schemas/control-work.1.schema.json"},
+  {"$ref": "https://podswarm.invalid/schemas/control-ckpt.1.schema.json"}
+ ],
+ "$comment": "Before ready a message has at most 4,096 bytes; after ready 1 MiB, 4 MiB after inflation (file 05, section 10)."
+}

@@ -1,0 +1,11 @@
+{
+ "iss": "podswarm:eu1",
+ "aud": "https://hooks.example",
+ "iat": 1794000000,
+ "nbf": 1794000000,
+ "exp": 1794000300,
+ "jti": "AAAAAAAAAAAAAAAAAAAAAA",
+ "body_sha256": "abababababababababababababababababababababababababababababababab",
+ "event_id": "01JC3Z8Y5R6T7V8W9X0Y1Z2A3B",
+ "delivery": "d-0001"
+}

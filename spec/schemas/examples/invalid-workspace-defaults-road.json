@@ -1,0 +1,5 @@
+{
+ "defaults": {
+  "road": "ssh://x.example"
+ }
+}

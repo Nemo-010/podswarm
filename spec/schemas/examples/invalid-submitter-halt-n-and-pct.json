@@ -1,0 +1,7 @@
+{
+ "t": "req",
+ "id": 2,
+ "op": "run_new",
+ "name": "nightly",
+ "halt": {"n": 5, "pct": 10}
+}

@@ -1,0 +1,8 @@
+{
+ "t": "net",
+ "task_id": 41,
+ "attempt_no": 1,
+ "proto": "tcp",
+ "dst": "db.example:5432",
+ "member": "lab1"
+}

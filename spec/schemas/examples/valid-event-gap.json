@@ -1,0 +1,6 @@
+{
+ "schema": 1,
+ "kind": "event",
+ "type": "gap",
+ "oldest": 5000
+}

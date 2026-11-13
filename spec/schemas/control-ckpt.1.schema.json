@@ -1,0 +1,135 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "$id": "https://podswarm.invalid/schemas/control-ckpt.1.schema.json",
+ "title": "Control: checkpoint messages",
+ "description": "The checkpoint messages on the control stream. Home: file 15, sections 11.5 and 11.10 (D-126); file 05, section 3 names them. A receiver ignores an object field that it does not know.",
+ "type": "object",
+ "required": ["t"],
+ "properties": {"t": {"enum": ["ckpt_req", "ckpt_commit", "ckpt_ack", "ckpt_key_req", "ckpt_key"]}},
+ "oneOf": [
+  {
+   "type": "object",
+   "required": ["t", "items", "cause", "grace_s", "stop"],
+   "properties": {
+    "t": {"const": "ckpt_req"},
+    "items": {
+     "type": "array",
+     "minItems": 1,
+     "items": {"type": "array", "minItems": 2, "prefixItems": [{"$ref": "#/$defs/u64"}, {"type": "integer", "minimum": 1, "maximum": 4294967295}]}
+    },
+    "cause": {"enum": ["user", "drain"], "$comment": "The causes that the authority knows (file 15, section 11.4)."},
+    "grace_s": {"type": "integer", "minimum": 1, "maximum": 600},
+    "stop": {"type": "boolean"}
+   },
+   "description": "File 15, section 11.5."
+  },
+  {
+   "type": "object",
+   "required": ["t", "task_id", "attempt_no", "seq", "manifest", "bytes", "files", "kind"],
+   "properties": {
+    "t": {"const": "ckpt_commit"},
+    "task_id": {"$ref": "#/$defs/u64"},
+    "attempt_no": {"type": "integer", "minimum": 1, "maximum": 4294967295},
+    "seq": {"type": "integer", "minimum": 1, "maximum": 4294967295},
+    "manifest": {"$ref": "#/$defs/blob_id"},
+    "bytes": {"$ref": "#/$defs/u64"},
+    "files": {"type": "integer", "minimum": 0, "maximum": 100000},
+    "kind": {"enum": ["files", "process", "guest"]},
+    "label": {"type": "string"},
+    "key_id": {"$ref": "#/$defs/hex16"},
+    "external_ref": {"type": "string"},
+    "skipped": {"type": "array", "items": {"type": "string"}}
+   },
+   "description": "File 15, section 11.5."
+  },
+  {
+   "type": "object",
+   "required": ["t", "task_id", "attempt_no", "seq", "verdict"],
+   "properties": {
+    "t": {"const": "ckpt_ack"},
+    "task_id": {"$ref": "#/$defs/u64"},
+    "attempt_no": {"type": "integer", "minimum": 1, "maximum": 4294967295},
+    "seq": {"type": "integer", "minimum": 1, "maximum": 4294967295},
+    "verdict": {"enum": ["accepted", "stale", "refused"]},
+    "err": {"type": "object", "required": ["code"], "properties": {"code": {"$ref": "#/$defs/err_code"}}}
+   },
+   "description": "File 15, section 11.5."
+  },
+  {
+   "type": "object",
+   "required": ["t", "task_id", "attempt_no", "key_id", "shield"],
+   "properties": {
+    "t": {"const": "ckpt_key_req"},
+    "task_id": {"$ref": "#/$defs/u64"},
+    "attempt_no": {"type": "integer", "minimum": 1, "maximum": 4294967295},
+    "key_id": {"$ref": "#/$defs/hex16"},
+    "shield": {"$ref": "#/$defs/shield_report"}
+   },
+   "description": "File 15, section 11.10 (D-126)."
+  },
+  {
+   "type": "object",
+   "required": ["t", "task_id", "attempt_no", "key_id", "sealed"],
+   "properties": {
+    "t": {"const": "ckpt_key"},
+    "task_id": {"$ref": "#/$defs/u64"},
+    "attempt_no": {"type": "integer", "minimum": 1, "maximum": 4294967295},
+    "key_id": {"$ref": "#/$defs/hex16"},
+    "sealed": {"type": "string", "pattern": "^[A-Za-z0-9_-]+$", "description": "The data key sealed to the link key of the worker, base64url with no padding (file 15, section 11.5)."}
+   },
+   "description": "File 15, section 11.10 (D-126)."
+  }
+ ],
+ "$defs": {
+  "blob_id": {
+   "type": "string",
+   "pattern": "^b3k?:[0-9a-f]{64}$",
+   "description": "A blob id: b3: or, for an encrypted checkpoint, b3k: (file 15, section 11.10)."
+  },
+  "err_code": {
+   "enum": [
+    "bad_request",
+    "bad_state",
+    "attempt_live",
+    "unauthorized",
+    "revoked",
+    "duplicate_identity",
+    "unsupported",
+    "busy",
+    "too_large",
+    "policy",
+    "needs_unsatisfiable",
+    "shield_unavailable",
+    "no_cell",
+    "wrong_cell",
+    "quota",
+    "not_found",
+    "internal"
+   ]
+  },
+  "hex16": {"type": "string", "pattern": "^[0-9a-f]{16}$"},
+  "shield": {"enum": ["none", "private", "guest", "sealed"]},
+  "shield_report": {
+   "type": "object",
+   "description": "The shield report of file 13, section 11.",
+   "required": ["asked", "got", "mode"],
+   "properties": {
+    "asked": {"$ref": "#/$defs/shield"},
+    "got": {"$ref": "#/$defs/shield"},
+    "mode": {"enum": ["claimed", "attested"]},
+    "area": {"enum": ["tmpfs-noswap", "ramfs-ns", "tmpfs-ns", "sealed-fuse", "runtime", null], "description": "A rung of file 13, section 6.2, or null at shield none."},
+    "swap": {"enum": ["none", "locked", "possible"]},
+    "cache": {"type": "boolean"},
+    "store": {"enum": ["warm", "cold", "discarded"]},
+    "left": {"type": "array", "items": {"type": "string"}},
+    "net_exit": {"type": "string"},
+    "measurement": {"type": "string", "pattern": "^[0-9a-f]{96}$"},
+    "tcb": {"type": "string", "pattern": "^[0-9a-f]{16}$"},
+    "crl": {"enum": ["ok", "stale", "absent"]}
+   }
+  },
+  "u32": {"type": "integer", "minimum": 0, "maximum": 4294967295},
+  "u64": {"type": "integer", "minimum": 0, "maximum": 18446744073709551615},
+  "unix": {"type": "integer", "minimum": 0, "description": "Unix seconds, wall clock."}
+ }
+}

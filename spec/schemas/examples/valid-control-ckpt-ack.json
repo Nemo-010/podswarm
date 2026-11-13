@@ -1,0 +1,12 @@
+{
+ "t": "ckpt_ack",
+ "task_id": 41,
+ "attempt_no": 1,
+ "seq": 4,
+ "verdict": "refused",
+ "err": {
+  "code": "quota",
+  "limit": 10240,
+  "used": 10300
+ }
+}

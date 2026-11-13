@@ -1,0 +1,23 @@
+[
+ 42,
+ 2,
+ 3,
+ 1,
+ "clip02.mp4",
+ {
+  "group": 0,
+  "key": "clip-02",
+  "vepoch": 17,
+  "ckpt": {
+   "seq": 3,
+   "manifest": "b3:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+   "bytes": 4096,
+   "files": 2
+  },
+  "tty": {
+   "rows": 40,
+   "cols": 120,
+   "term": "xterm-256color"
+  }
+ }
+]

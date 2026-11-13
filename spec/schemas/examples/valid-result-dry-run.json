@@ -1,0 +1,13 @@
+{
+ "schema": 1,
+ "kind": "dry_run",
+ "actions": [
+  {
+   "op": "place",
+   "target": "big",
+   "detail": {
+    "view": "fuse"
+   }
+  }
+ ]
+}

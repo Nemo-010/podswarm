@@ -1,0 +1,11 @@
+{
+ "schema": 1,
+ "argv": [
+  "make",
+  "-j8"
+ ],
+ "checkpoint": {
+  "encrypt": "run",
+  "sink": "git"
+ }
+}

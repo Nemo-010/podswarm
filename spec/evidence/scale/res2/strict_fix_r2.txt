@@ -1,0 +1,85 @@
+### fix workers=10 bundle=1 12:21:06
+RESULT workers=10 bundle=1 dur=strict tail=true lease_wait=true ckpt=idle tasks=9940 wall=15.01s tasks_per_s=662 mean_bundle=1.0
+  pull_lat_ms p50=6.71 p99=12.44  result_ack_lat_ms p50=6.81 p99=14.17
+  commits=1988 commits_per_s=132 events_per_commit=10.0 commit_ms p50=4.40 p99=9.25 max=13.91
+  cpu_s total=1.10 writer=0.77 sched=0.29 loadgen=0.03  coord_cores=0.07  rss_hwm_mib=16
+  per task coord cpu us: writer=78 sched=30; wal_max_bytes=865232 db_bytes=498479104 idle_ckpts=111 (1258ms) startup_ready_queue_s=0.13
+exit=0
+### fix workers=10 bundle=10 12:21:22
+RESULT workers=10 bundle=10 dur=strict tail=true lease_wait=true ckpt=idle tasks=85270 wall=15.01s tasks_per_s=5680 mean_bundle=10.0
+  pull_lat_ms p50=7.64 p99=16.59  result_ack_lat_ms p50=7.67 p99=17.42
+  commits=1712 commits_per_s=114 events_per_commit=10.0 commit_ms p50=5.21 p99=11.10 max=15.82
+  cpu_s total=2.51 writer=1.95 sched=0.56 loadgen=-0.00  coord_cores=0.17  rss_hwm_mib=16
+  per task coord cpu us: writer=23 sched=7; wal_max_bytes=2834592 db_bytes=514510848 idle_ckpts=98 (1428ms) startup_ready_queue_s=0.14
+exit=0
+### fix workers=10 bundle=100 12:21:37
+RESULT workers=10 bundle=100 dur=strict tail=true lease_wait=true ckpt=idle tasks=378900 wall=15.05s tasks_per_s=25172 mean_bundle=100.0
+  pull_lat_ms p50=15.80 p99=51.58  result_ack_lat_ms p50=15.93 p99=52.00
+  commits=842 commits_per_s=56 events_per_commit=9.0 commit_ms p50=12.67 p99=22.36 max=28.68
+  cpu_s total=7.57 writer=5.84 sched=1.75 loadgen=-0.03  coord_cores=0.50  rss_hwm_mib=16
+  per task coord cpu us: writer=15 sched=5; wal_max_bytes=14452992 db_bytes=575897600 idle_ckpts=54 (1901ms) startup_ready_queue_s=0.13
+exit=0
+### fix workers=10 bundle=1000 12:21:53
+RESULT workers=10 bundle=1000 dur=strict tail=true lease_wait=true ckpt=idle tasks=647000 wall=15.17s tasks_per_s=42641 mean_bundle=1000.0
+  pull_lat_ms p50=84.58 p99=287.54  result_ack_lat_ms p50=113.89 p99=1066.36
+  commits=219 commits_per_s=14 events_per_commit=5.9 commit_ms p50=56.18 p99=133.53 max=162.02
+  cpu_s total=11.94 writer=9.68 sched=2.23 loadgen=0.02  coord_cores=0.79  rss_hwm_mib=20
+  per task coord cpu us: writer=15 sched=3; wal_max_bytes=80150512 db_bytes=631783424 idle_ckpts=18 (2008ms) startup_ready_queue_s=0.08
+exit=0
+### fix workers=1000 bundle=1 12:22:09
+RESULT workers=1000 bundle=1 dur=strict tail=true lease_wait=true ckpt=idle tasks=223444 wall=15.05s tasks_per_s=14850 mean_bundle=1.0
+  pull_lat_ms p50=29.34 p99=57.36  result_ack_lat_ms p50=29.48 p99=60.89
+  commits=1746 commits_per_s=116 events_per_commit=255.9 commit_ms p50=7.04 p99=14.12 max=40.67
+  cpu_s total=7.38 writer=4.86 sched=1.54 loadgen=0.98  coord_cores=0.43  rss_hwm_mib=21
+  per task coord cpu us: writer=22 sched=7; wal_max_bytes=5833952 db_bytes=543469568 idle_ckpts=109 (1768ms) startup_ready_queue_s=0.23
+exit=0
+### fix workers=1000 bundle=10 12:22:25
+RESULT workers=1000 bundle=10 dur=strict tail=true lease_wait=true ckpt=idle tasks=569710 wall=15.24s tasks_per_s=37378 mean_bundle=10.0
+  pull_lat_ms p50=112.22 p99=236.00  result_ack_lat_ms p50=113.60 p99=1004.07
+  commits=446 commits_per_s=29 events_per_commit=255.5 commit_ms p50=27.67 p99=51.58 max=54.15
+  cpu_s total=11.17 writer=8.97 sched=1.87 loadgen=0.34  coord_cores=0.71  rss_hwm_mib=19
+  per task coord cpu us: writer=16 sched=3; wal_max_bytes=37005872 db_bytes=615940096 idle_ckpts=31 (2185ms) startup_ready_queue_s=0.10
+exit=0
+### fix workers=1000 bundle=100 12:22:40
+RESULT workers=1000 bundle=100 dur=strict tail=true lease_wait=true ckpt=idle tasks=800000 wall=16.89s tasks_per_s=47359 mean_bundle=100.0
+  pull_lat_ms p50=916.29 p99=2202.00  result_ack_lat_ms p50=939.81 p99=2232.11
+  commits=63 commits_per_s=4 events_per_commit=254.0 commit_ms p50=225.35 p99=351.19 max=351.19
+  cpu_s total=14.78 writer=12.39 sched=2.41 loadgen=-0.02  coord_cores=0.88  rss_hwm_mib=25
+  per task coord cpu us: writer=15 sched=3; wal_max_bytes=329336352 db_bytes=663777280 idle_ckpts=15 (2263ms) startup_ready_queue_s=0.13
+exit=0
+### fix workers=1000 bundle=1000 12:22:58
+RESULT workers=1000 bundle=1000 dur=strict tail=true lease_wait=true ckpt=idle tasks=865597 wall=16.36s tasks_per_s=52897 mean_bundle=216.4
+  pull_lat_ms p50=1713.39 p99=3119.61  result_ack_lat_ms p50=2190.52 p99=3586.35
+  commits=32 commits_per_s=2 events_per_commit=250.0 commit_ms p50=420.91 p99=1045.25 max=1045.25
+  cpu_s total=16.12 writer=13.33 sched=2.84 loadgen=-0.04  coord_cores=0.99  rss_hwm_mib=39
+  per task coord cpu us: writer=15 sched=3; wal_max_bytes=0 db_bytes=677376000 idle_ckpts=13 (1520ms) startup_ready_queue_s=0.13
+exit=0
+### fix workers=10000 bundle=1 12:23:16
+RESULT workers=10000 bundle=1 dur=strict tail=true lease_wait=true ckpt=idle tasks=199894 wall=15.78s tasks_per_s=12669 mean_bundle=1.0
+  pull_lat_ms p50=376.37 p99=1235.99  result_ack_lat_ms p50=373.85 p99=576.89
+  commits=1602 commits_per_s=102 events_per_commit=249.6 commit_ms p50=7.35 p99=17.98 max=75.31
+  cpu_s total=6.68 writer=4.54 sched=1.36 loadgen=0.78  coord_cores=0.37  rss_hwm_mib=29
+  per task coord cpu us: writer=23 sched=7; wal_max_bytes=5838072 db_bytes=538472448 idle_ckpts=92 (2118ms) startup_ready_queue_s=0.13
+exit=0
+### fix workers=10000 bundle=10 12:23:32
+RESULT workers=10000 bundle=10 dur=strict tail=true lease_wait=true ckpt=idle tasks=600000 wall=16.73s tasks_per_s=35864 mean_bundle=10.0
+  pull_lat_ms p50=1446.19 p99=2593.14  result_ack_lat_ms p50=1412.10 p99=1944.56
+  commits=471 commits_per_s=28 events_per_commit=254.8 commit_ms p50=27.82 p99=50.51 max=70.43
+  cpu_s total=12.17 writer=9.90 sched=1.99 loadgen=0.28  coord_cores=0.71  rss_hwm_mib=44
+  per task coord cpu us: writer=16 sched=3; wal_max_bytes=40524352 db_bytes=622268416 idle_ckpts=35 (2840ms) startup_ready_queue_s=0.13
+exit=0
+### fix workers=10000 bundle=100 12:23:49
+RESULT workers=10000 bundle=100 dur=strict tail=true lease_wait=true ckpt=idle tasks=784555 wall=17.92s tasks_per_s=43780 mean_bundle=26.2
+  pull_lat_ms p50=3106.80 p99=5107.77  result_ack_lat_ms p50=2423.41 p99=4462.02
+  commits=236 commits_per_s=13 events_per_commit=254.2 commit_ms p50=63.59 p99=114.56 max=168.46
+  cpu_s total=14.14 writer=11.55 sched=2.55 loadgen=0.05  coord_cores=0.79  rss_hwm_mib=83
+  per task coord cpu us: writer=15 sched=3; wal_max_bytes=163992512 db_bytes=660537344 idle_ckpts=25 (3220ms) startup_ready_queue_s=0.14
+exit=0
+### fix workers=10000 bundle=1000 12:24:08
+RESULT workers=10000 bundle=1000 dur=strict tail=true lease_wait=true ckpt=idle tasks=784555 wall=17.71s tasks_per_s=44304 mean_bundle=26.2
+  pull_lat_ms p50=3204.97 p99=5761.35  result_ack_lat_ms p50=2662.56 p99=5206.80
+  commits=236 commits_per_s=13 events_per_commit=254.2 commit_ms p50=56.97 p99=133.92 max=144.06
+  cpu_s total=14.64 writer=12.07 sched=2.52 loadgen=0.05  coord_cores=0.82  rss_hwm_mib=82
+  per task coord cpu us: writer=15 sched=3; wal_max_bytes=164911272 db_bytes=660582400 idle_ckpts=22 (2958ms) startup_ready_queue_s=0.13
+exit=0
+ALLDONE

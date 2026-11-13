@@ -1,0 +1,91 @@
+{
+ "schema": 1,
+ "tmpl": 1,
+ "shell": "ffmpeg -i {} {/-}.webm",
+ "env": {
+  "LANG": "C.UTF-8"
+ },
+ "inherit_env": false,
+ "cwd": "media",
+ "io": "capture",
+ "merge": false,
+ "stdin": {
+  "blob": "b3:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+ },
+ "files": [
+  {
+   "id": "b3:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+   "path": "data.csv",
+   "mode": "0644"
+  },
+  {
+   "tree": "b3:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+   "path": "inputs"
+  },
+  {
+   "url": "https://data.example/model.bin",
+   "sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+   "size": 1048576,
+   "path": "model.bin"
+  }
+ ],
+ "outputs": [
+  "out/*.webm"
+ ],
+ "needs": {
+  "cores_m": 2000,
+  "mem_mib": 4096,
+  "res": {
+   "gpu": 1
+  },
+  "boundary": "confined",
+  "shield": "private",
+  "os": [
+   "linux"
+  ],
+  "arch": [
+   "x86_64"
+  ],
+  "limits_required": [
+   "mem_mib"
+  ]
+ },
+ "limits": {
+  "cpu_s": 3600,
+  "mem_mib": 8192,
+  "nofile": 1024
+ },
+ "confine": {
+  "read": [
+   "data"
+  ],
+  "connect": [
+   443
+  ],
+  "udp": false
+ },
+ "net": "pool;require=enforced;home=5432,6379",
+ "checkpoint": {
+  "exit_code": 85,
+  "grace_s": 60,
+  "retain": 3,
+  "encrypt": "run"
+ },
+ "timeout_s": 7200,
+ "kill_grace_s": 10,
+ "silence_s": 60,
+ "ok_codes": [
+  0,
+  1
+ ],
+ "capture_max": 16384,
+ "retries": 2,
+ "retry_delay_s": 5,
+ "max_lost": 5,
+ "delivery": "at_least_once",
+ "priority": 10,
+ "tags": {
+  "team": "media",
+  "nightly": ""
+ }
+}
